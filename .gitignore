@@ -1,0 +1,12 @@
+#ignore the venv folder
+venv/
+
+#byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+#VS Code settings
+.vscode/
+
+#Mac/Linux System Files
+.DS_Store
