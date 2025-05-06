@@ -49,7 +49,7 @@ class MovieLogger():
     
         #create the frames
         self.watchlist_frame = tk.Frame(self.root)
-        self.watchlist_frame.grid(row=4, column=0, columnspan=3)
+        self.watchlist_frame.grid(row=4, column=0, columnspan=3, sticky="nsew")
 
         #create labels for interface & grid them
         self.search_label = tk.Label(self.root, text="Movie Search")
