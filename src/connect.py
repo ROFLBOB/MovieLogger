@@ -1,15 +1,22 @@
 import requests
 from movie import Movie
+from dotenv import load_dotenv
+import os
 
 #This class connects to the OMDB API and collects information about the movies or errors
 class Connect():
-    def __init__(self, URL, API_KEY):
+    def __init__(self, URL):
+        load_dotenv()
+        try:
+            self.__API_KEY = os.getenv("API_KEY")
+        except Exception:
+            print("error loading API key from environment file. Does it exist?")
+            self.__API_KEY = ""
         self.URL = URL
-        self.API_KEY = API_KEY
 
     #connect to the api and search for a movie. Returns an array with either movie objects or an error message
     def search(self, title):
-        params = {"apikey":self.API_KEY, "s":title}
+        params = {"apikey":self.__API_KEY, "s":title}
         response = requests.get(self.URL, params = params)
         #check if successful
         if response.status_code == 200:
@@ -36,7 +43,3 @@ class Connect():
                 movie_list.append(search_result_movie)
             for each in movie_list:
                 print(each.get_title())
-
-
-connection = Connect("http://www.omdbapi.com/", "9cda324")
-connection.search("Back to the Future")

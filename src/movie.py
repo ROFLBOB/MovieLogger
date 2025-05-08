@@ -16,3 +16,6 @@ class Movie():
     
     def get_id(self):
         return self._id
+    
+    def get_thumbnail_url(self):
+        return self._thumbnail_url

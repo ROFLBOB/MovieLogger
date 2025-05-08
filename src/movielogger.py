@@ -50,17 +50,20 @@ class MovieLogger():
         #create the frames
         self.watchlist_frame = tk.Frame(self.root)
         self.watchlist_frame.grid(row=4, column=0, columnspan=3, sticky="nsew")
+        
+        #Statuses
+        self.STATUS = ["Error!","Awaiting Lookup", "Results fetched"]
 
         #create labels for interface & grid them
         self.search_label = tk.Label(self.root, text="Movie Search")
         self.search_label.grid(row=0, column=0, sticky="nsew")
-        self.status_label = tk.Label(self.root, text="Awaiting lookup")
+        self.status_label = tk.Label(self.root, text=self.STATUS[1])
         self.status_label.grid(row=1, column=0, sticky="nsew")
         self.watchlist_label = tk.Label(self.watchlist_frame, text="Watchlist")
         self.watchlist_label.grid(row=0, column = 0, sticky="nsew")
 
         #create buttons for interface & grid them
-        self.search_button = tk.Button(self.root, text="Search Now")
+        self.search_button = tk.Button(self.root, text="Search Now", command=self.search)
         self.search_button.grid(row=0, column=2, columnspan=2, sticky="nsew")
         
         #create text input for interface & grid them
@@ -84,7 +87,6 @@ class MovieLogger():
         self.watchlist_canvas.config(xscrollcommand=self.watchlist_scrollbar.set)
         self.watchlist_scrollbar.grid(row=5, column=0, columnspan=3, sticky="ew")
 
-
         #set weights for columns and rows (changes the size compared to other cells)
         self.root.columnconfigure(0, weight=1)
         self.root.columnconfigure(1, weight=1)
@@ -93,6 +95,22 @@ class MovieLogger():
         self.root.rowconfigure(4, weight=1)
         self.watchlist_frame.rowconfigure(1, weight=1)
         self.watchlist_frame.columnconfigure(0, weight=1)
+        
+        #
+        
+    #search button function
+    def search(self):
+        search_query = self.search_field.get()
+        if len(search_query)<0:
+            return
+        connection = Connect("http://www.omdbapi.com/")
+        connection.search(search_query)
+        self.set_status_label(self.STATUS[2])
+        
+    #updated the status label on the main window
+    def set_status_label(self,status):
+        self.status_label.config(text=self.STATUS[status])
 
 
 generateUI()
+
