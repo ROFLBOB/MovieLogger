@@ -33,7 +33,7 @@ class MovieLogger():
         #Watchlist
         self.watchlist_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Watchlist", menu=self.watchlist_menu)
-        self.watchlist_menu.add_command(label="View Watchlist")
+        self.watchlist_menu.add_command(label="View Watchlist", command = self.toggle_frame)
         self.watchlist_menu.add_command(label="Export")  
 
         #Review
@@ -114,6 +114,19 @@ class MovieLogger():
     def exit_program(self):
         self.root.destroy()
         self.root.quit()
+
+    def toggle_frame(self):
+        if self.watchlist_frame.winfo_ismapped():
+            self.watchlist_frame.grid_forget()
+            self.watchlist_scrollbar.grid_forget()
+            self.root.rowconfigure(2, weight=5)
+            self.root.rowconfigure(4, weight=0)
+        else:
+            self.watchlist_frame.grid(row=4, column=0, columnspan=3, sticky="nsew")
+            self.watchlist_scrollbar.grid(row=5, column=0, columnspan=3, sticky="ew")
+            self.root.rowconfigure(2, weight=1)
+            self.root.rowconfigure(4, weight=1)
+
 
 
 generateUI()
