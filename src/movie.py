@@ -8,6 +8,12 @@ class Movie():
         self._type = movie["Type"]
         self._thumbnail_url = movie["Poster"]
     
+    def __str__(self):
+        return f"Movie(Title: {self._title}, Year: {self._year}, IMDBID: {self._id}, Type: {self._type}, Thumbnail URL: {self._thumbnail_url})\n"
+    
+    def __repr__(self):
+        return f"Movie(Title: {self._title}, Year: {self._year}, IMDBID: {self._id}, Type: {self._type}, Thumbnail URL: {self._thumbnail_url})\n"
+    
     def get_title(self):
         return self._title
     

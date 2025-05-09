@@ -24,7 +24,7 @@ class Connect():
         if response.status_code == 200:
             data = response.json()
             #print(data)
-            self.format(data)
+            return self.format(data)
         else:
             #unsuccessful connection. Set error message and return it in a list
             error = True
@@ -32,7 +32,7 @@ class Connect():
             print(f"connection unsuccessful. {response.status_code}")
             return [error_message, error]
 
-    #if the connection was successful, format the json query into usable data
+    #if the connection was successful, format the json query into usable data. returns a list of movies
     def format(self, data):
         movie_list = []
         print(data)
@@ -44,5 +44,6 @@ class Connect():
             for movie in data["Search"]:
                 search_result_movie = Movie(movie)
                 movie_list.append(search_result_movie)
-            for each in movie_list:
-                print(each.get_title())
+            #for each in movie_list:
+            #    print(each.get_title())
+            return movie_list

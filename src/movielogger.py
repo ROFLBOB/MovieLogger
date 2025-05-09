@@ -96,7 +96,8 @@ class MovieLogger():
         self.watchlist_frame.rowconfigure(1, weight=1)
         self.watchlist_frame.columnconfigure(0, weight=1)
         
-        #
+        #List of movies from most recent Search
+        self.movies_query = None
         
     #search button function
     def search(self):
@@ -104,8 +105,13 @@ class MovieLogger():
         if len(search_query)<=0:
             return
         connection = Connect("http://www.omdbapi.com/")
-        connection.search(search_query)
+        self.movies_query = connection.search(search_query)
+        if self.movies_query == None:
+            self.set_status_label(0)
+            print(self.movies_query)
+            return
         self.set_status_label(2)
+        print(self.movies_query)
         
     #updated the status label on the main window
     def set_status_label(self,status):
