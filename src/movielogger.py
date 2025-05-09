@@ -33,7 +33,7 @@ class MovieLogger():
         #Watchlist
         self.watchlist_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Watchlist", menu=self.watchlist_menu)
-        self.watchlist_menu.add_command(label="View Watchlist", command = self.toggle_frame)
+        self.watchlist_menu.add_command(label="Toggle Watchlist", command = self.toggle_frame)
         self.watchlist_menu.add_command(label="Export")  
 
         #Review
@@ -52,7 +52,7 @@ class MovieLogger():
         self.watchlist_frame.grid(row=4, column=0, columnspan=3, sticky="nsew")
         
         #Statuses
-        self.STATUS = ["Error!","Awaiting Lookup", "Results fetched"]
+        self.STATUS = ["Error!","Awaiting Lookup", "Results fetched", "Type a Movie Name"]
 
         #create labels for interface & grid them
         self.search_label = tk.Label(self.root, text="Movie Search")
@@ -87,6 +87,18 @@ class MovieLogger():
         self.watchlist_canvas.config(xscrollcommand=self.watchlist_scrollbar.set)
         self.watchlist_scrollbar.grid(row=5, column=0, columnspan=3, sticky="ew")
 
+        
+        self.movies_container = tk.Frame(self.search_results_canvas)
+        #self.search_results_canvas.create_window((0,0), window=)
+        #self.movies_container = tk.Frame(self.movie_frame)
+        #individual movie frame
+        #col 1: thumbnail
+        #col 2: Movie Info (TItle, Year, Rating)
+        #col 3: Lookup Button
+        #col 4: Watchlist button
+        #col 5: Favorite
+        #col 6: Review button
+
         #set weights for columns and rows (changes the size compared to other cells)
         self.root.columnconfigure(0, weight=1)
         self.root.columnconfigure(1, weight=1)
@@ -103,6 +115,7 @@ class MovieLogger():
     def search(self):
         search_query = self.search_field.get()
         if len(search_query)<=0:
+            self.set_status_label(3)
             return
         connection = Connect("http://www.omdbapi.com/")
         self.movies_query = connection.search(search_query)
