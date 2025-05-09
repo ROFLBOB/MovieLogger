@@ -28,7 +28,7 @@ class MovieLogger():
         #File
         self.file_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="File", menu=self.file_menu)
-        self.file_menu.add_command(label="Exit")
+        self.file_menu.add_command(label="Exit", command=self.exit_program)
         
         #Watchlist
         self.watchlist_menu = tk.Menu(self.menubar, tearoff=0)
@@ -101,15 +101,19 @@ class MovieLogger():
     #search button function
     def search(self):
         search_query = self.search_field.get()
-        if len(search_query)<0:
+        if len(search_query)<=0:
             return
         connection = Connect("http://www.omdbapi.com/")
         connection.search(search_query)
-        self.set_status_label(self.STATUS[2])
+        self.set_status_label(2)
         
     #updated the status label on the main window
     def set_status_label(self,status):
         self.status_label.config(text=self.STATUS[status])
+
+    def exit_program(self):
+        self.root.destroy()
+        self.root.quit()
 
 
 generateUI()

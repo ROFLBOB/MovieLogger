@@ -8,7 +8,9 @@ class Connect():
     def __init__(self, URL):
         load_dotenv()
         try:
-            self.__API_KEY = os.getenv("API_KEY")
+            self.__API_KEY = os.getenv("API_KEY", default = "demo_key")
+            if self.__API_KEY == "demo_key":
+                return
         except Exception:
             print("error loading API key from environment file. Does it exist?")
             self.__API_KEY = ""
@@ -25,9 +27,10 @@ class Connect():
             self.format(data)
         else:
             #unsuccessful connection. Set error message and return it in a list
+            error = True
             error_message = f"Connection unsuccessful. Response code {response.status_code}"
             print(f"connection unsuccessful. {response.status_code}")
-            return [error_message]
+            return [error_message, error]
 
     #if the connection was successful, format the json query into usable data
     def format(self, data):
