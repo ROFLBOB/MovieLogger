@@ -89,8 +89,10 @@ class MovieLogger():
 
         
         self.movies_container = tk.Frame(self.search_results_canvas)
-        #self.search_results_canvas.create_window((0,0), window=)
-        #self.movies_container = tk.Frame(self.movie_frame)
+        self.movies_container.grid_columnconfigure(0, weight=1) #column 0 expands
+
+        self.search_results_canvas.create_window((0,0), window=self.movies_container, anchor="nw")
+        
         #individual movie frame
         #col 1: thumbnail
         #col 2: Movie Info (TItle, Year, Rating)
@@ -124,6 +126,43 @@ class MovieLogger():
             print(self.movies_query)
             return
         self.set_status_label(2)
+
+        #for each movie in self.movies_query, use the movie info to create a new movies frame and pack it to the search frame
+        num_movies = 0
+
+        #parent object of single movie frame must have weight so it expands
+        self.movies_container.grid_columnconfigure(0,weight=1)
+
+        for movie in self.movies_query:
+            single_movie_frame = tk.Frame(self.movies_container)
+            if not (isinstance(movie, Movie)):
+                raise TypeError("movie must be a Movie object")
+
+            #make the labels
+            title_label = tk.Label(single_movie_frame, text=movie.get_title())
+            year_label = tk.Label(single_movie_frame, text=movie.get_year())
+            id_label = tk.Label(single_movie_frame, text=movie.get_id())
+            thumbnail_label = tk.Label(single_movie_frame, text="URL")
+
+            #grid the labels to the frame
+            thumbnail_label.grid(row=0, column=0, rowspan=3, sticky="nsew")
+            title_label.grid(row=0, column=1, sticky="nsew")
+            year_label.grid(row=1, column=1, sticky="nsew")
+            id_label.grid(row=2, column=1, sticky="nsew")
+
+            #grid the frame to self.movies_container
+            single_movie_frame.grid(row = num_movies, column = 0, sticky="nsew")
+            single_movie_frame.config(highlightbackground = "green", borderwidth=1)
+
+            #set the weights
+
+
+
+            num_movies += 1
+
+
+
+
         print(self.movies_query)
         
     #updated the status label on the main window
