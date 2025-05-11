@@ -91,8 +91,17 @@ class MovieLogger():
         self.movies_container = tk.Frame(self.search_results_canvas)
         self.movies_container.grid_columnconfigure(0, weight=1) #column 0 expands
 
-        self.search_results_canvas.create_window((0,0), window=self.movies_container, anchor="nw")
+        self.search_results_window = self.search_results_canvas.create_window((0,0), window=self.movies_container, anchor="nw")
+
+        #add event bindings
+        #this one sets the width of the search_results_window to be the width of the search_results_canvas
+        self.search_results_canvas.bind(
+            "<Configure>",
+            lambda e: self.search_results_canvas.itemconfig(self.search_results_window, width=self.search_results_canvas.winfo_width())
+        )
         
+        
+
         #individual movie frame
         #col 1: thumbnail
         #col 2: Movie Info (TItle, Year, Rating)
@@ -109,6 +118,8 @@ class MovieLogger():
         self.root.rowconfigure(4, weight=1)
         self.watchlist_frame.rowconfigure(1, weight=1)
         self.watchlist_frame.columnconfigure(0, weight=1)
+        self.movies_container.grid_columnconfigure(0, weight=1)
+        self.movies_container.grid_rowconfigure(0, weight=1)
         
         #List of movies from most recent Search
         self.movies_query = None
@@ -144,26 +155,42 @@ class MovieLogger():
             id_label = tk.Label(single_movie_frame, text=movie.get_id())
             thumbnail_label = tk.Label(single_movie_frame, text="URL")
 
+            #make the buttons
+            lookup_button = tk.Button(single_movie_frame, text="Lookup")
+            watchlist_button = tk.Button(single_movie_frame, text="Watchlist")
+            favorites_button = tk.Button(single_movie_frame, text="Favorite")
+            review_button = tk.Button(single_movie_frame, text="Review")
+
             #grid the labels to the frame
             thumbnail_label.grid(row=0, column=0, rowspan=3, sticky="nsew")
             title_label.grid(row=0, column=1, sticky="nsew")
             year_label.grid(row=1, column=1, sticky="nsew")
             id_label.grid(row=2, column=1, sticky="nsew")
 
+            #grid the buttons
+            lookup_button.grid(row=0, column=2, sticky="nsew")
+            watchlist_button.grid(row=0, column=3, sticky="nsew")
+            favorites_button.grid(row=0, column=4, sticky="nsew") 
+            review_button.grid(row=0, column=5, sticky="nsew")
+
             #grid the frame to self.movies_container
             single_movie_frame.grid(row = num_movies, column = 0, sticky="nsew")
-            single_movie_frame.config(highlightbackground = "green", borderwidth=1)
+            single_movie_frame.config(highlightbackground = "green", borderwidth=1, highlightthickness=1)
 
             #set the weights
-
+            single_movie_frame.grid_columnconfigure(0, weight=1)
+            single_movie_frame.grid_columnconfigure(1, weight=1)
+            single_movie_frame.grid_rowconfigure(num_movies, weight=1)
 
 
             num_movies += 1
 
 
 
-
+        self.search_results_canvas.update_idletasks()
+        self.search_results_canvas.config(scrollregion=self.search_results_canvas.bbox("all"))
         print(self.movies_query)
+
         
     #updated the status label on the main window
     def set_status_label(self,status):
