@@ -226,11 +226,12 @@ class MovieLogger():
 
         #from here, connect to the API and search for the ttid. Then, gather the extra information and display it in a window
         movie_lookup = Connect(self._OMDB_URL)
+        movie_lookup.lookup(movie.get_id())
         lookup_window.title(movie.get_title())
 
 
         #create the frame
-        tk.Label(lookup_window)
+        tk.Label(lookup_window, movie.get_title())
 
     #adds the movie to the favorites list
     def add_to_favorites(self, movie):
