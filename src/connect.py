@@ -47,6 +47,12 @@ class Connect():
             #for each in movie_list:
             #    print(each.get_title())
             return movie_list
+        #Title isn't in the response so it must be an individual movie lookup
+        else:
+            movie_lookup_result = Movie(data)
+            return movie_lookup_result
+
+
         
     def lookup(self, id):
         params = {"apikey":self.__API_KEY, "i":id}
@@ -54,4 +60,5 @@ class Connect():
         #check if successful
         if response.status_code == 200:
             data = response.json()
-            print(data)
+            return self.format(data)
+            

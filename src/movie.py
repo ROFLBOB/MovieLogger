@@ -2,11 +2,20 @@ class Movie():
     #movie is a dictionary containing information about the movie
     #{"title":"jaws","year":1979,"id"="1235td"}
     def __init__(self, movie = {"Title":"N/A", "Year":"N/A", "imdbID":"N/A", "Type":"N/A", "Poster":"N/A"}):
-        self._title = movie["Title"]
-        self._year = movie["Year"]
-        self._id = movie["imdbID"]
-        self._type = movie["Type"]
-        self._thumbnail_url = movie["Poster"]
+        self._movie_data = movie
+        self._title = movie.get("Title", "N/A")
+        self._year = movie.get("Year", "N/A")
+        self._id = movie.get("imdbID", "N/A")
+        self._type = movie.get("Type", "N/A")
+        self._thumbnail_url = movie.get("Poster", "N/A")
+        self._rating = movie.get("Rated", "N/A")
+        self._released = movie.get("Released", "N/A")
+        self._runtime = movie.get("Runtime", "N/A")
+        self._genre = movie.get("Genre", "N/A")
+        self._director = movie.get("Director", "N/A")
+        self._actors = movie.get("Actors", "N/A")
+        self._plot = movie.get("Plot", "N/A")
+        self._boxoffice = movie.get("BoxOffice", "N/A")  
     
     def __str__(self):
         return f"Movie(Title: {self._title}, Year: {self._year}, IMDBID: {self._id}, Type: {self._type}, Thumbnail URL: {self._thumbnail_url})\n"
@@ -25,3 +34,27 @@ class Movie():
     
     def get_thumbnail_url(self):
         return self._thumbnail_url
+    
+    def get_rating(self):
+        return self._rating
+    
+    def get_released(self):
+        return self._released
+
+    def get_runtime(self):
+        return self.runtime
+    
+    def get_genre(self):
+        return self._genre
+    
+    def get_director(self):
+        return self._director
+    
+    def get_actors(self):
+        return self._actors
+    
+    def get_plot(self):
+        return self._plot
+    
+    def get_boxoffice(self):
+        return self._boxoffice

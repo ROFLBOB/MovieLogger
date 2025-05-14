@@ -154,7 +154,7 @@ class MovieLogger():
             thumbnail_label = tk.Label(single_movie_frame, text="URL")
 
             #make the buttons
-            lookup_button = tk.Button(single_movie_frame, text="Lookup", command=lambda m=single_movie_frame.movie: self.lookup_movie(m))
+            lookup_button = tk.Button(single_movie_frame, text="Lookup", command=lambda m=movie: self.lookup_movie(m))
             watchlist_button = tk.Button(single_movie_frame, text="Watchlist")
             favorites_button = tk.Button(single_movie_frame, text="Favorite")
             review_button = tk.Button(single_movie_frame, text="Review")
@@ -221,17 +221,28 @@ class MovieLogger():
         if movie is None:
             print("error, lookup button clicked and movie is None")
             return
+        print(f"Looking up movie: {movie.get_title()}, {movie.get_id}")
         #find the name of the movie frame that was clicked
         lookup_window = tk.Toplevel(self.root)
 
         #from here, connect to the API and search for the ttid. Then, gather the extra information and display it in a window
         movie_lookup = Connect(self._OMDB_URL)
-        movie_lookup.lookup(movie.get_id())
+        full_movie_info = movie_lookup.lookup(movie.get_id())
+        
+
+
         lookup_window.title(movie.get_title())
 
 
         #create the frame
-        tk.Label(lookup_window, movie.get_title())
+        tk.Label(lookup_window, text=full_movie_info.get_title()).pack()
+        tk.Label(lookup_window, text=full_movie_info.get_year()).pack()
+        tk.Label(lookup_window, text=full_movie_info.get_rating()).pack()
+        tk.Label(lookup_window, text=full_movie_info.get_plot()).pack()
+        tk.Label(lookup_window, text=full_movie_info.get_director()).pack()
+        tk.Label(lookup_window, text=full_movie_info.get_boxoffice()).pack()
+        tk.Label(lookup_window, text=full_movie_info.get_released()).pack()
+
 
     #adds the movie to the favorites list
     def add_to_favorites(self, movie):
