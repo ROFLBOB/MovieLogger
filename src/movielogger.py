@@ -1,7 +1,7 @@
 from connect import Connect
 from movie import Movie
 from watchlist import Watchlist
-from tkinter import ttk, DISABLED, NORMAL, PhotoImage, LEFT
+from tkinter import ttk, DISABLED, NORMAL, PhotoImage, LEFT, font
 from PIL import Image, ImageTk
 import tkinter as tk
 from format import WrappingLabel
@@ -44,6 +44,9 @@ class MovieLogger():
         self.menubar.add_cascade(label="Review", menu=self.review_menu)
         self.review_menu.add_command(label="Add/Update Review")
         self.review_menu.add_command(label="Read Review")
+
+        #Create custom fonts
+        self.bold = font.Font(weight="bold")
     
         #create the frames
         self.watchlist_frame = tk.Frame(self.root)
@@ -226,6 +229,7 @@ class MovieLogger():
         #find the name of the movie frame that was clicked
         lookup_window = tk.Toplevel(self.root)
         lookup_window.geometry("400x400")
+        lookup_window.movie = movie
 
         #from here, connect to the API and search for the ttid. Then, gather the extra information and display it in a window
         movie_lookup = Connect(self._OMDB_URL)
@@ -236,15 +240,20 @@ class MovieLogger():
         lookup_window.title(movie.get_title())
 
         #get string for metadata
-        metadata = f"Released: {full_movie_info.get_released()}\nRating: {full_movie_info.get_rating()}\n\
-            Director: {full_movie_info.get_director()}\nBox Office: {full_movie_info.get_boxoffice()}"
+        metadata = f"Released: {full_movie_info.get_released()}\nRating: {full_movie_info.get_rating()}\n"\
+                    f"Director: {full_movie_info.get_director()}\nBox Office: {full_movie_info.get_boxoffice()}"
+        
+        #configure column weights
+        lookup_window.columnconfigure(0,weight=1)
+        lookup_window.columnconfigure(1, weight=2)
 
         #grid the labels to the lookup_window
         tk.Label(lookup_window, text="Movie Lookup:", justify="left", anchor="w").grid(column=0, row=0, sticky="nsew")
         tk.Label(lookup_window, text="URL", justify="left", anchor="w").grid(column=0,row=1, sticky="nsew")
-        tk.Label(lookup_window, text=full_movie_info.get_title(), justify="left", anchor="w").grid(column=1,row=0, sticky="nsew")
+        tk.Label(lookup_window, text=full_movie_info.get_title(), justify="left", anchor="w", font=self.bold).grid(column=1,row=0, sticky="nsew")
         tk.Label(lookup_window, text=metadata, justify="left", anchor="w").grid(column=1, row=1, sticky="nsew")
-        WrappingLabel(lookup_window, text=f"Plot: {full_movie_info.get_plot()}", justify="left", anchor="w", wraplength=lookup_window.winfo_width()).grid(column=0, row=2, columnspan=2, sticky="nsew")
+        WrappingLabel(lookup_window, text=f"Plot: {full_movie_info.get_plot()}", justify="left", anchor="w", wraplength=400).grid(column=0, row=2, columnspan=2, sticky="nsew")
+
 
 
     #adds the movie to the favorites list
