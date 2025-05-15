@@ -47,6 +47,12 @@ class MovieLogger():
 
         #Create custom fonts
         self.bold = font.Font(weight="bold")
+
+        #create the watchlist that holds the list of movie objects
+        self.watchlist = []
+
+        #load watchlist from file
+        #to do
     
         #create the frames
         self.watchlist_frame = tk.Frame(self.root)
@@ -159,7 +165,7 @@ class MovieLogger():
 
             #make the buttons
             lookup_button = tk.Button(single_movie_frame, text="Lookup", command=lambda m=movie: self.lookup_movie(m))
-            watchlist_button = tk.Button(single_movie_frame, text="Watchlist")
+            watchlist_button = tk.Button(single_movie_frame, text="Watchlist", command=lambda m=movie: self.add_to_watchlist(m))
             favorites_button = tk.Button(single_movie_frame, text="Favorite")
             review_button = tk.Button(single_movie_frame, text="Review")
 
@@ -217,7 +223,8 @@ class MovieLogger():
     #adds the movie to the watchlist
     #takes a movie object
     def add_to_watchlist(self, movie):
-        return
+        self.watchlist.append(movie)
+        print(f"Added {movie.get_title()} to self.watchlist")
 
     #opens a new top level window that has more information about the movie such as a bigger thumbnail, actors, plot, etc
     #takes a movie object
