@@ -93,7 +93,7 @@ class MovieLogger():
         self.watchlist_canvas.config(xscrollcommand=self.watchlist_scrollbar.set)
         self.watchlist_scrollbar.grid(row=5, column=0, columnspan=3, sticky="ew")
 
-        
+        #set up the frame container for the search results
         self.movies_container = tk.Frame(self.search_results_canvas)
         self.movies_container.grid_columnconfigure(0, weight=1) #column 0 expands
 
@@ -106,8 +106,6 @@ class MovieLogger():
             "<Configure>",
             lambda e: self.search_results_canvas.itemconfig(self.search_results_window, width=self.search_results_canvas.winfo_width())
         )
-        
-        
 
         #individual movie frame
         #col 1: thumbnail
@@ -130,6 +128,9 @@ class MovieLogger():
         
         #List of movies from most recent Search
         self.movies_query = None
+
+        self.watchlist_container = tk.Frame(self.watchlist_canvas)
+        self.watchlist_window = self.watchlist_canvas.create_window((0,0), window=self.watchlist_container, anchor="nw")
         
     #search button function
     def search(self):
@@ -223,7 +224,24 @@ class MovieLogger():
     #adds the movie to the watchlist
     #takes a movie object
     def add_to_watchlist(self, movie):
+        if movie in self.watchlist:
+            print(f"{movie.get_title()} already in watchlist!")
+            return
         self.watchlist.append(movie)
+        #create the frame and pack it to self.watchlist_container
+        watchlist_movie_frame = tk.Frame(self.watchlist_container)
+        URL_label = tk.Label(watchlist_movie_frame,text="URL").grid(column=0,row=0)
+        title_label = tk.Label(watchlist_movie_frame,text=movie.get_title(), font=self.bold).grid(column=0,row=2)
+        lookup_button = tk.Button(watchlist_movie_frame, text="Lookup").grid(column=1, row=0)
+        remove_from_watchlist_button = tk.Button(watchlist_movie_frame, text="-").grid(column=1,row=1)
+        watchlist_movie_frame.pack(side=LEFT)
+
+        #reset the scrollable region after updating the frame
+        self.watchlist_canvas.update_idletasks()
+        self.watchlist_canvas.config(scrollregion=self.watchlist_canvas.bbox("all"))
+
+        
+
         print(f"Added {movie.get_title()} to self.watchlist")
 
     #opens a new top level window that has more information about the movie such as a bigger thumbnail, actors, plot, etc
