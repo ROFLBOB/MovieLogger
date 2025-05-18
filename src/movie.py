@@ -23,6 +23,15 @@ class Movie():
     def __repr__(self):
         return f"Movie(Title: {self._title}, Year: {self._year}, IMDBID: {self._id}, Type: {self._type}, Thumbnail URL: {self._thumbnail_url})\n"
     
+    def __eq__(self, other):
+        isMovie = isinstance(other,self.__class__)
+        if not isMovie:
+            return False
+        if self.get_id() == other.get_id():
+            return True
+        else:
+            return False
+    
     def get_title(self):
         return self._title
     

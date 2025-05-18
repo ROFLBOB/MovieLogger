@@ -233,16 +233,15 @@ class MovieLogger():
         URL_label = tk.Label(watchlist_movie_frame,text="URL").grid(column=0,row=0)
         title_label = tk.Label(watchlist_movie_frame,text=movie.get_title(), font=self.bold).grid(column=0,row=2)
         lookup_button = tk.Button(watchlist_movie_frame, text="Lookup").grid(column=1, row=0)
-        remove_from_watchlist_button = tk.Button(watchlist_movie_frame, text="-").grid(column=1,row=1)
+        remove_from_watchlist_button = tk.Button(watchlist_movie_frame, text="-", command=lambda m=movie:self.remove_movie_from_watchlist(m)).grid(column=1,row=1)
         watchlist_movie_frame.pack(side=LEFT)
 
         #reset the scrollable region after updating the frame
         self.watchlist_canvas.update_idletasks()
         self.watchlist_canvas.config(scrollregion=self.watchlist_canvas.bbox("all"))
-
-        
-
+        watchlist_movie_frame.movie = movie
         print(f"Added {movie.get_title()} to self.watchlist")
+        return watchlist_movie_frame
 
     #opens a new top level window that has more information about the movie such as a bigger thumbnail, actors, plot, etc
     #takes a movie object
@@ -278,6 +277,18 @@ class MovieLogger():
         tk.Label(lookup_window, text=full_movie_info.get_title(), justify="left", anchor="w", font=self.bold).grid(column=1,row=0, sticky="nsew")
         tk.Label(lookup_window, text=metadata, justify="left", anchor="w").grid(column=1, row=1, sticky="nsew")
         WrappingLabel(lookup_window, text=f"Plot: {full_movie_info.get_plot()}", justify="left", anchor="w", wraplength=400).grid(column=0, row=2, columnspan=2, sticky="nsew")
+
+    #remove specific movie from the watchlist
+    def remove_movie_from_watchlist(self,movie):
+        for m in self.watchlist:
+            if m == movie:
+                self.watchlist.remove(m)
+                print(f"{m.get_title()} removed from the watchlist.")
+        
+        #loop through the frames in the watchlist window and check to see if the frame's movie is equal to the movie
+        for element in self.watchlist_container.winfo_children():
+            if element.movie == movie:
+                element.destroy()
 
 
 
