@@ -15,7 +15,8 @@ class Movie():
         self._director = movie.get("Director", "N/A")
         self._actors = movie.get("Actors", "N/A")
         self._plot = movie.get("Plot", "N/A")
-        self._boxoffice = movie.get("BoxOffice", "N/A")  
+        self._boxoffice = movie.get("BoxOffice", "N/A")
+        self._poster_image = None
     
     def __str__(self):
         return f"Movie(Title: {self._title}, Year: {self._year}, IMDBID: {self._id}, Type: {self._type}, Thumbnail URL: {self._thumbnail_url})\n"
@@ -67,3 +68,9 @@ class Movie():
     
     def get_boxoffice(self):
         return self._boxoffice
+    
+    def set_poster_image(self, image):
+        self._poster_image = image
+    
+    def get_poster_image(self):
+        return self._poster_image

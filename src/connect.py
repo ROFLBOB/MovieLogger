@@ -61,4 +61,4 @@ class Connect():
         if response.status_code == 200:
             data = response.json()
             return self.format(data)
-            
+        

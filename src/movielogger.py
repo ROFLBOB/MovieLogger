@@ -5,6 +5,8 @@ from tkinter import ttk, DISABLED, NORMAL, PhotoImage, LEFT, font
 from PIL import Image, ImageTk
 import tkinter as tk
 from format import WrappingLabel
+import requests
+from io import BytesIO
 
 def generateUI():
     root = tk.Tk()
@@ -158,11 +160,14 @@ class MovieLogger():
             if not (isinstance(movie, Movie)):
                 raise TypeError("movie must be a Movie object")
 
+            #download the poster
+            poster = self.download_movie_poster(movie)
+
             #make the labels
             title_label = tk.Label(single_movie_frame, text=movie.get_title())
             year_label = tk.Label(single_movie_frame, text=movie.get_year())
             id_label = tk.Label(single_movie_frame, text=movie.get_id())
-            thumbnail_label = tk.Label(single_movie_frame, text="URL")
+            thumbnail_label = tk.Label(single_movie_frame, text="URL", image=poster)
 
             #make the buttons
             lookup_button = tk.Button(single_movie_frame, text="Lookup", command=lambda m=movie: self.lookup_movie(m))
@@ -271,9 +276,11 @@ class MovieLogger():
         lookup_window.columnconfigure(0,weight=1)
         lookup_window.columnconfigure(1, weight=2)
 
+
+
         #grid the labels to the lookup_window
         tk.Label(lookup_window, text="Movie Lookup:", justify="left", anchor="w").grid(column=0, row=0, sticky="nsew")
-        tk.Label(lookup_window, text="URL", justify="left", anchor="w").grid(column=0,row=1, sticky="nsew")
+        tk.Label(lookup_window, image=movie.get_poster_image(), justify="left", anchor="w").grid(column=0,row=1, sticky="nsew")
         tk.Label(lookup_window, text=full_movie_info.get_title(), justify="left", anchor="w", font=self.bold).grid(column=1,row=0, sticky="nsew")
         tk.Label(lookup_window, text=metadata, justify="left", anchor="w").grid(column=1, row=1, sticky="nsew")
         WrappingLabel(lookup_window, text=f"Plot: {full_movie_info.get_plot()}", justify="left", anchor="w", wraplength=400).grid(column=0, row=2, columnspan=2, sticky="nsew")
@@ -299,6 +306,18 @@ class MovieLogger():
     #open the personal review for the specified movie
     def open_reviews(self, movie):
         return
+    
+    #takes a movie and returns a thumbnail image to be used in a label
+    def download_movie_poster(self,movie):
+        url = movie.get_thumbnail_url()
+        download = requests.get(url,stream=True)
+        image_data = BytesIO(download.content)
+        image = Image.open(image_data)
+        image.thumbnail((150,150))
+        thumbnail = ImageTk.PhotoImage(image)
+        movie.set_poster_image(thumbnail)
+        return thumbnail
+            
 
 
 generateUI()
