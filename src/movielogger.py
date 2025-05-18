@@ -235,16 +235,17 @@ class MovieLogger():
         self.watchlist.append(movie)
         #create the frame and pack it to self.watchlist_container
         watchlist_movie_frame = tk.Frame(self.watchlist_container)
-        URL_label = tk.Label(watchlist_movie_frame,text="URL").grid(column=0,row=0)
+        watchlist_movie_frame.movie = movie
+        URL_label = tk.Label(watchlist_movie_frame,image=movie.get_poster_image()).grid(column=0,row=0)
         title_label = tk.Label(watchlist_movie_frame,text=movie.get_title(), font=self.bold).grid(column=0,row=2)
-        lookup_button = tk.Button(watchlist_movie_frame, text="Lookup").grid(column=1, row=0)
+        lookup_button = tk.Button(watchlist_movie_frame, text="Lookup", command=lambda m=movie: self.lookup_movie(m)).grid(column=1, row=0)
         remove_from_watchlist_button = tk.Button(watchlist_movie_frame, text="-", command=lambda m=movie:self.remove_movie_from_watchlist(m)).grid(column=1,row=1)
         watchlist_movie_frame.pack(side=LEFT)
 
         #reset the scrollable region after updating the frame
         self.watchlist_canvas.update_idletasks()
         self.watchlist_canvas.config(scrollregion=self.watchlist_canvas.bbox("all"))
-        watchlist_movie_frame.movie = movie
+
         print(f"Added {movie.get_title()} to self.watchlist")
         return watchlist_movie_frame
 
@@ -263,9 +264,6 @@ class MovieLogger():
         #from here, connect to the API and search for the ttid. Then, gather the extra information and display it in a window
         movie_lookup = Connect(self._OMDB_URL)
         full_movie_info = movie_lookup.lookup(movie.get_id())
-        
-
-
         lookup_window.title(movie.get_title())
 
         #get string for metadata
