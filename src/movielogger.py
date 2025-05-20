@@ -1,7 +1,7 @@
 from connect import Connect
 from movie import Movie
 from watchlist import Watchlist
-from tkinter import ttk, DISABLED, NORMAL, PhotoImage, LEFT, font
+from tkinter import ttk, DISABLED, NORMAL, PhotoImage, LEFT, font, Scale, DoubleVar, scrolledtext
 from PIL import Image, ImageTk
 import tkinter as tk
 from format import WrappingLabel
@@ -173,7 +173,7 @@ class MovieLogger():
             lookup_button = tk.Button(single_movie_frame, text="Lookup", command=lambda m=movie: self.lookup_movie(m))
             watchlist_button = tk.Button(single_movie_frame, text="Watchlist", command=lambda m=movie: self.add_to_watchlist(m))
             favorites_button = tk.Button(single_movie_frame, text="Favorite")
-            review_button = tk.Button(single_movie_frame, text="Review")
+            review_button = tk.Button(single_movie_frame, text="Review", command=lambda m=movie: self.open_reviews(m))
 
             #grid the labels to the frame
             thumbnail_label.grid(row=0, column=0, rowspan=3, sticky="nsew")
@@ -303,7 +303,38 @@ class MovieLogger():
     
     #open the personal review for the specified movie
     def open_reviews(self, movie):
+        reviews_panel = tk.Toplevel(self.root)
+        reviews_panel.geometry("600x600")
+        reviews_panel.title(f"Review for {movie.get_title()}")
+
+        review_scale = Scale(reviews_panel, variable=DoubleVar, from_=0.5, to=5.0, tickinterval=0.5, orient="horizontal", length=500, resolution=0.5)
+        
+        if movie.get_review_score() == None:
+            review_scale.set(3.0)
+        else:
+            review_scale.set(movie.get_review_score())
+
+        #set_review_button = tk.Button(reviews_panel, text="Save Review", command=lambda m=movie:m.set_review_score(review_scale.get()))
+        set_review_button = tk.Button(reviews_panel, text="Save Review", command=lambda m=movie:self.set_review(m, review_scale, written_review))
+
+        written_review = scrolledtext.ScrolledText(reviews_panel, wrap=tk.WORD, width=80, height=20)
+
+        if movie.get_review_text() != None:
+            written_review.insert(tk.END, movie.get_review_text())
+
+        review_scale.pack()
+        written_review.pack()
+        set_review_button.pack()
+
+
         return
+    
+    def set_review(self, movie, scale, textbox):
+        movie.set_review_score(scale.get())
+        review_text = textbox.get("1.0", tk.END)
+        movie.set_review_text(review_text)
+        return movie
+
     
     #takes a movie and returns a thumbnail image to be used in a label
     def download_movie_poster(self,movie):

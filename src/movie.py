@@ -17,6 +17,8 @@ class Movie():
         self._plot = movie.get("Plot", "N/A")
         self._boxoffice = movie.get("BoxOffice", "N/A")
         self._poster_image = None
+        self._review_score = None
+        self._text_review = None
     
     def __str__(self):
         return f"Movie(Title: {self._title}, Year: {self._year}, IMDBID: {self._id}, Type: {self._type}, Thumbnail URL: {self._thumbnail_url})\n"
@@ -74,3 +76,17 @@ class Movie():
     
     def get_poster_image(self):
         return self._poster_image
+    
+    def get_review_score(self):
+        return self._review_score
+    
+    def set_review_score(self, score):
+        self._review_score = score
+        print(f"Set {self.get_title()}'s review score to {score}.")
+
+    def get_review_text(self):
+        return self._text_review
+    
+    def set_review_text(self, text):
+        self._text_review = text
+        print(f"Set {self.get_title()}'s text review to:\n{text}")
