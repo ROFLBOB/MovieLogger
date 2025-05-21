@@ -23,14 +23,19 @@ class Connect():
         #check if successful
         if response.status_code == 200:
             data = response.json()
-            #print(data)
+            #check if response contains any movies
+            print(f'data.get("Response"): {data.get("Response")}')
+            if data.get("Response") == "False":
+                return "No movies found."
+            print(f"Data: {data}")
             return self.format(data)
+
         else:
             #unsuccessful connection. Set error message and return it in a list
             error = True
             error_message = f"Connection unsuccessful. Response code {response.status_code}"
             print(f"connection unsuccessful. {response.status_code}")
-            return [error_message, error]
+            return "Error"
 
     #if the connection was successful, format the json query into usable data. returns a list of movies
     def format(self, data):

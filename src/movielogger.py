@@ -61,7 +61,7 @@ class MovieLogger():
         self.watchlist_frame.grid(row=4, column=0, columnspan=3, sticky="nsew")
         
         #Statuses
-        self.STATUS = ["Error!","Awaiting Lookup", "Results fetched", "Type a Movie Name"]
+        self.STATUS = ["Error!","Awaiting Lookup", "Results fetched", "Type a Movie Name", "No movies found."]
 
         #create labels for interface & grid them
         self.search_label = tk.Label(self.root, text="Movie Search")
@@ -151,10 +151,12 @@ class MovieLogger():
             return
         connection = Connect("http://www.omdbapi.com/")
         self.movies_query = connection.search(search_query)
-        if self.movies_query == None:
-            self.set_status_label(0)
-            print(self.movies_query)
+        print(f"Movies Query:{self.movies_query}")
+        if self.movies_query == "No movies found.":
+            #no movies found so setting status label and returning early
+            self.set_status_label(4)
             return
+        #there's at least one movie returned
         self.set_status_label(2)
 
         #for each movie in self.movies_query, use the movie info to create a new movies frame and pack it to the search frame
