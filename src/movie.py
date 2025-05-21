@@ -19,6 +19,7 @@ class Movie():
         self._poster_image = None
         self._review_score = None
         self._text_review = None
+        self._runtime = None
     
     def __str__(self):
         return f"Movie(Title: {self._title}, Year: {self._year}, IMDBID: {self._id}, Type: {self._type}, Thumbnail URL: {self._thumbnail_url})\n"
@@ -90,3 +91,16 @@ class Movie():
     def set_review_text(self, text):
         self._text_review = text
         print(f"Set {self.get_title()}'s text review to:\n{text}")
+    
+    #convert movie to dictionary
+    def to_dictionary(self):
+        return{
+            "id":self.get_id(),
+            "title":self.get_title(),
+            "poster_url":self.get_thumbnail_url(),
+            "review_text":self.get_review_text(),
+            "review_score":self.get_review_score()
+        }
+    
+    def load_from_dictionary(self):
+        return
