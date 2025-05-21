@@ -11,3 +11,6 @@ __pycache__/
 #Mac/Linux System Files
 .DS_Store
 .env
+
+#ignore movie data folder
+movie_data/

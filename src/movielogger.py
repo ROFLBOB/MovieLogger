@@ -133,6 +133,15 @@ class MovieLogger():
 
         self.watchlist_container = tk.Frame(self.watchlist_canvas)
         self.watchlist_window = self.watchlist_canvas.create_window((0,0), window=self.watchlist_container, anchor="nw")
+
+        #check if the movie_data folder exists and create it if it doesn't
+            #create the watchlist.txt file
+        
+        #since movie_data exists, check if watchlist.txt exists
+        #watchlist is a txt file that holds all of the movie ids
+
+        #for each line in the watchlist.txt file, check if a folder with the movie id exists
+            #if it does exist, navigate into it and check if the 
         
     #search button function
     def search(self):
@@ -163,11 +172,15 @@ class MovieLogger():
             #download the poster
             poster = self.download_movie_poster(movie)
 
+
             #make the labels
             title_label = tk.Label(single_movie_frame, text=movie.get_title())
             year_label = tk.Label(single_movie_frame, text=movie.get_year())
             id_label = tk.Label(single_movie_frame, text=movie.get_id())
-            thumbnail_label = tk.Label(single_movie_frame, text="URL", image=poster)
+            if poster == None:
+                thumbnail_label = tk.Label(single_movie_frame, text="Not Available")
+            else:
+                thumbnail_label = tk.Label(single_movie_frame, text="URL", image=poster)
 
             #make the buttons
             lookup_button = tk.Button(single_movie_frame, text="Lookup", command=lambda m=movie: self.lookup_movie(m))
@@ -236,7 +249,10 @@ class MovieLogger():
         #create the frame and pack it to self.watchlist_container
         watchlist_movie_frame = tk.Frame(self.watchlist_container)
         watchlist_movie_frame.movie = movie
-        URL_label = tk.Label(watchlist_movie_frame,image=movie.get_poster_image()).grid(column=0,row=0)
+        if movie.get_poster_image() == None:
+            URL_label = tk.Label(watchlist_movie_frame,text="Not Available").grid(column=0,row=0)
+        else:
+            URL_label = tk.Label(watchlist_movie_frame,image=movie.get_poster_image()).grid(column=0,row=0)
         title_label = tk.Label(watchlist_movie_frame,text=movie.get_title(), font=self.bold).grid(column=0,row=2)
         lookup_button = tk.Button(watchlist_movie_frame, text="Lookup", command=lambda m=movie: self.lookup_movie(m)).grid(column=1, row=0)
         remove_from_watchlist_button = tk.Button(watchlist_movie_frame, text="-", command=lambda m=movie:self.remove_movie_from_watchlist(m)).grid(column=1,row=1)
@@ -278,7 +294,10 @@ class MovieLogger():
 
         #grid the labels to the lookup_window
         tk.Label(lookup_window, text="Movie Lookup:", justify="left", anchor="w").grid(column=0, row=0, sticky="nsew")
-        tk.Label(lookup_window, image=movie.get_poster_image(), justify="left", anchor="w").grid(column=0,row=1, sticky="nsew")
+        if movie.get_poster_image()==None:
+            tk.Label(lookup_window, text="Not Available", justify="left", anchor="w").grid(column=0,row=1, sticky="nsew")
+        else:
+            tk.Label(lookup_window, image=movie.get_poster_image(), justify="left", anchor="w").grid(column=0,row=1, sticky="nsew")    
         tk.Label(lookup_window, text=full_movie_info.get_title(), justify="left", anchor="w", font=self.bold).grid(column=1,row=0, sticky="nsew")
         tk.Label(lookup_window, text=metadata, justify="left", anchor="w").grid(column=1, row=1, sticky="nsew")
         WrappingLabel(lookup_window, text=f"Plot: {full_movie_info.get_plot()}", justify="left", anchor="w", wraplength=400).grid(column=0, row=2, columnspan=2, sticky="nsew")
@@ -340,6 +359,8 @@ class MovieLogger():
     def download_movie_poster(self,movie):
         url = movie.get_thumbnail_url()
         download = requests.get(url,stream=True)
+        if download.status_code != 200:
+            return
         image_data = BytesIO(download.content)
         image = Image.open(image_data)
         image.thumbnail((150,150))
