@@ -139,14 +139,9 @@ class MovieLogger():
         self.watchlist_container = tk.Frame(self.watchlist_canvas)
         self.watchlist_window = self.watchlist_canvas.create_window((0,0), window=self.watchlist_container, anchor="nw")
 
-        #check if the movie_data folder exists and create it if it doesn't
-            #create the watchlist.txt file
-        
-        #since movie_data exists, check if watchlist.txt exists
-        #watchlist is a txt file that holds all of the movie ids
+        for entry in self.watchlist:
+            self.add_movie_frame_to_watchlist(entry)
 
-        #for each line in the watchlist.txt file, check if a folder with the movie id exists
-            #if it does exist, navigate into it and check if the 
         
     #search button function
     def search(self):
@@ -254,6 +249,9 @@ class MovieLogger():
             return
         self.watchlist.append(movie)
         #create the frame and pack it to self.watchlist_container
+        self.add_movie_frame_to_watchlist(movie)
+
+    def add_movie_frame_to_watchlist(self, movie):
         watchlist_movie_frame = tk.Frame(self.watchlist_container)
         watchlist_movie_frame.movie = movie
         if movie.get_poster_image() == None:
@@ -388,6 +386,8 @@ class MovieLogger():
                 for item in data:
                     movie = Movie()
                     movie = movie.load_from_dictionary(item)
+                    thumbnail = self.download_movie_poster(movie)
+                    movie.set_poster_image(thumbnail)
                     movies.append(movie)
         except FileNotFoundError:
             print(f"{filename} not found. Returning empty list.")
