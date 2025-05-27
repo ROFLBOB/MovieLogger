@@ -45,7 +45,7 @@ class MovieLogger():
         self.watchlist_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Watchlist", menu=self.watchlist_menu)
         self.watchlist_menu.add_command(label="Toggle Watchlist", command = self.toggle_frame)
-        self.watchlist_menu.add_command(label="Export", command=lambda: self.save_movies_to_file(self.watchlist, "watchlist.json"))  
+        self.watchlist_menu.add_command(label="Save Watchlist", command=lambda: self.save_movies_to_file(self.watchlist, "watchlist.json"))  
 
         #Review
         self.review_menu = tk.Menu(self.menubar, tearoff=0)
@@ -306,6 +306,13 @@ class MovieLogger():
         tk.Label(lookup_window, text=full_movie_info.get_title(), justify="left", anchor="w", font=self.bold).grid(column=1,row=0, sticky="nsew")
         tk.Label(lookup_window, text=metadata, justify="left", anchor="w").grid(column=1, row=1, sticky="nsew")
         WrappingLabel(lookup_window, text=f"Plot: {full_movie_info.get_plot()}", justify="left", anchor="w", wraplength=400).grid(column=0, row=2, columnspan=2, sticky="nsew")
+        if lookup_window.movie in self.watchlist:
+            tk.Button(lookup_window, text="In Watchlist", state=tk.DISABLED).grid(column=0,row=3, sticky="nsew")    
+        else:
+            tk.Button(lookup_window, text="Add To Watchlist", command=lambda: self.add_to_watchlist(lookup_window.movie)).grid(column=0,row=3, sticky="nsew")
+        
+        tk.Button(lookup_window, text="Favorite").grid(column=1,row=3, sticky="nsew")
+        
 
     #remove specific movie from the watchlist
     def remove_movie_from_watchlist(self,movie):
