@@ -30,6 +30,9 @@ class MovieLogger():
         #load movies from watchlist if there are any saved
         self.watchlist = self.load_movies_from_file("watchlist.json")
 
+        #load reviews doc
+        self.movie_reviews = self.load_reviews_from_file("reviews.json")
+
         print(self.watchlist)
 
         #add menu bar
@@ -248,6 +251,7 @@ class MovieLogger():
             print(f"{movie.get_title()} already in watchlist!")
             return
         self.watchlist.append(movie)
+        print(f"Added {movie.get_title()} to self.watchlist")
         #create the frame and pack it to self.watchlist_container
         self.add_movie_frame_to_watchlist(movie)
 
@@ -267,7 +271,7 @@ class MovieLogger():
         self.watchlist_canvas.update_idletasks()
         self.watchlist_canvas.config(scrollregion=self.watchlist_canvas.bbox("all"))
 
-        print(f"Added {movie.get_title()} to self.watchlist")
+        
         return watchlist_movie_frame
 
     #opens a new top level window that has more information about the movie such as a bigger thumbnail, actors, plot, etc
@@ -306,12 +310,14 @@ class MovieLogger():
         tk.Label(lookup_window, text=full_movie_info.get_title(), justify="left", anchor="w", font=self.bold).grid(column=1,row=0, sticky="nsew")
         tk.Label(lookup_window, text=metadata, justify="left", anchor="w").grid(column=1, row=1, sticky="nsew")
         WrappingLabel(lookup_window, text=f"Plot: {full_movie_info.get_plot()}", justify="left", anchor="w", wraplength=400).grid(column=0, row=2, columnspan=2, sticky="nsew")
+        tk.Label(lookup_window, text=f"{lookup_window.movie.get_review_score()}", justify="left", anchor="w").grid(column=0, row=3, sticky="nsew")
         if lookup_window.movie in self.watchlist:
-            tk.Button(lookup_window, text="In Watchlist", state=tk.DISABLED).grid(column=0,row=3, sticky="nsew")    
+            tk.Button(lookup_window, text="In Watchlist", state=tk.DISABLED).grid(column=0,row=4, sticky="nsew")    
         else:
-            tk.Button(lookup_window, text="Add To Watchlist", command=lambda: self.add_to_watchlist(lookup_window.movie)).grid(column=0,row=3, sticky="nsew")
+            tk.Button(lookup_window, text="Add To Watchlist", command=lambda: self.add_to_watchlist(lookup_window.movie)).grid(column=0,row=4, sticky="nsew")
         
-        tk.Button(lookup_window, text="Favorite").grid(column=1,row=3, sticky="nsew")
+        tk.Button(lookup_window, text="Favorite").grid(column=1,row=4, sticky="nsew")
+        tk.Button(lookup_window, text="Review", command=lambda : self.open_reviews(lookup_window.movie)).grid(column=2,row=4, sticky="nsew")
         
 
     #remove specific movie from the watchlist
@@ -337,22 +343,26 @@ class MovieLogger():
         reviews_panel = tk.Toplevel(self.root)
         reviews_panel.geometry("600x600")
         reviews_panel.title(f"Review for {movie.get_title()}")
+        review_score = 3.0
+        #check if movie has a review in the self.movie_reviews list
+        print(f"reviews list: {self.movie_reviews}")
+        for review in self.movie_reviews:
+            if review.get("imdbID") == movie.get_id():
+                #movie has a review, set review text and score
+                movie.set_review_text(review.get("Review"))
+                movie.set_review_score(review.get("Review Score"))
+                review_score = movie.get_review_score()
 
         review_scale = Scale(reviews_panel, variable=DoubleVar, from_=0.5, to=5.0, tickinterval=0.5, orient="horizontal", length=500, resolution=0.5)
+        review_scale.set(review_score)
         
-        if movie.get_review_score() == None:
-            review_scale.set(3.0)
-        else:
-            review_scale.set(movie.get_review_score())
-
         #set_review_button = tk.Button(reviews_panel, text="Save Review", command=lambda m=movie:m.set_review_score(review_scale.get()))
         set_review_button = tk.Button(reviews_panel, text="Save Review", command=lambda m=movie:self.set_review(m, review_scale, written_review))
 
         written_review = scrolledtext.ScrolledText(reviews_panel, wrap=tk.WORD, width=80, height=20)
-
+        print(written_review)
         if movie.get_review_text() != None:
             written_review.insert(tk.END, movie.get_review_text())
-
         review_scale.pack()
         written_review.pack()
         set_review_button.pack()
@@ -364,11 +374,16 @@ class MovieLogger():
         movie.set_review_score(scale.get())
         review_text = textbox.get("1.0", tk.END)
         movie.set_review_text(review_text)
+        self.movie_reviews.append(movie)
+        print(f"{movie.get_title()} now has a review: {movie.get_review_text()}")
+        self.save_movie_review(movie, "reviews.json")
         return movie
 
     
     #takes a movie and returns a thumbnail image to be used in a label
     def download_movie_poster(self,movie):
+        if movie.get_thumbnail_url is None:
+            return None
         url = movie.get_thumbnail_url()
         download = requests.get(url,stream=True)
         if download.status_code != 200:
@@ -384,6 +399,14 @@ class MovieLogger():
         with open(filename, "w", encoding="utf-8") as f:
             json.dump([movie.to_dictionary() for movie in movies], f, indent=4)
             print(f"added to file")
+
+    #figure out how to save the reviews to a file
+    #should be an xml file, movie_reviews [{"ttid": "12345", "Review Score": 3.0, "Review": "Movie Review Here"}]
+    def save_movie_review(self, movie, filename):
+        with open(filename, "w", encoding="utf-8") as f:
+
+            json.dump([movie.review_to_dictionary() for movie in self.movie_reviews], f, indent=4)
+            print(f"reviews saved.")
     
     def load_movies_from_file(self,filename):
         movies = []
@@ -399,6 +422,26 @@ class MovieLogger():
         except FileNotFoundError:
             print(f"{filename} not found. Returning empty list.")
         return movies
+    
+    def load_reviews_from_file(self, filename):
+        reviews = []
+        try:
+            with open(filename, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                print(data)
+                for movie in data:
+                    #print(movie)
+                    reviews.append({"imdbID":data["imdbID"],"Review Score":data["Review Score"],"Review":data["Review"]})
+                return reviews
+        except FileNotFoundError:
+            print(f"{filename} not found, returning empty list")
+            return reviews
+
+
+    #"imdbID": self.get_id(),
+    #"Review Score": self.get_review_score(),
+    #"Review": self.get_review_text()
+                    
 
 
 generateUI()

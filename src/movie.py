@@ -17,15 +17,15 @@ class Movie():
         self._plot = movie.get("Plot", "N/A")
         self._boxoffice = movie.get("BoxOffice", "N/A")
         self._poster_image = None
-        self._review_score = None
-        self._text_review = None
+        self._review_score = movie.get("review_score", None)
+        self._text_review = movie.get("review_text", None)
         self._runtime = None
     
     def __str__(self):
-        return f"Movie(Title: {self._title}, Year: {self._year}, IMDBID: {self._id}, Type: {self._type}, Thumbnail URL: {self._thumbnail_url})\n"
+        return f"Movie(Title: {self._title}, Year: {self._year}, IMDBID: {self._id}, Type: {self._type}, Thumbnail URL: {self._thumbnail_url})\nReview Score: {self.get_review_score()}"
     
     def __repr__(self):
-        return f"Movie(Title: {self._title}, Year: {self._year}, IMDBID: {self._id}, Type: {self._type}, Thumbnail URL: {self._thumbnail_url})\n"
+        return f"Movie(Title: {self._title}, Year: {self._year}, IMDBID: {self._id}, Type: {self._type}, Thumbnail URL: {self._thumbnail_url})\nReview Score: {self.get_review_score()}"
     
     def __eq__(self, other):
         isMovie = isinstance(other,self.__class__)
@@ -91,6 +91,14 @@ class Movie():
     def set_review_text(self, text):
         self._text_review = text
         print(f"Set {self.get_title()}'s text review to:\n{text}")
+
+    #convert movie review to dictionary
+    def review_to_dictionary(self):
+        return{
+            "imdbID": self.get_id(),
+            "Review Score": self.get_review_score(),
+            "Review": self.get_review_text()
+        }
     
     #convert movie to dictionary
     def to_dictionary(self):
