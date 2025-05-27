@@ -95,12 +95,21 @@ class Movie():
     #convert movie to dictionary
     def to_dictionary(self):
         return{
-            "id":self.get_id(),
-            "title":self.get_title(),
-            "poster_url":self.get_thumbnail_url(),
+            "imdbID":self.get_id(),
+            "Title":self.get_title(),
+            "Year":self.get_year(),
+            "Poster":self.get_thumbnail_url(),
             "review_text":self.get_review_text(),
             "review_score":self.get_review_score()
         }
     
-    def load_from_dictionary(self):
-        return
+    @staticmethod
+    def load_from_dictionary(data):
+        return Movie({
+            "Title":data["Title"],
+            "Year":data["Year"],
+            "Poster":data["Poster"],
+            "imdbID":data["imdbID"],
+            "review_text":data["review_text"],
+            "review_score":data["review_score"]
+        })

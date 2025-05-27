@@ -14,3 +14,6 @@ __pycache__/
 
 #ignore movie data folder
 movie_data/
+
+#ignore json file
+watchlist.json

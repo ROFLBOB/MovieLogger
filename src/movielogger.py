@@ -5,7 +5,7 @@ from tkinter import ttk, DISABLED, NORMAL, PhotoImage, LEFT, font, Scale, Double
 from PIL import Image, ImageTk
 import tkinter as tk
 from format import WrappingLabel
-import requests
+import requests, json
 from io import BytesIO
 
 def generateUI():
@@ -26,6 +26,12 @@ class MovieLogger():
         rgb = root.winfo_rgb(bg_color)
         self.bg_color_code = "#%x%x%x" % rgb
 
+
+        #load movies from watchlist if there are any saved
+        self.watchlist = self.load_movies_from_file("watchlist.json")
+
+        print(self.watchlist)
+
         #add menu bar
         self.menubar = tk.Menu(root)
         root.config(menu=self.menubar)
@@ -39,7 +45,7 @@ class MovieLogger():
         self.watchlist_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Watchlist", menu=self.watchlist_menu)
         self.watchlist_menu.add_command(label="Toggle Watchlist", command = self.toggle_frame)
-        self.watchlist_menu.add_command(label="Export")  
+        self.watchlist_menu.add_command(label="Export", command=lambda: self.save_movies_to_file(self.watchlist, "watchlist.json"))  
 
         #Review
         self.review_menu = tk.Menu(self.menubar, tearoff=0)
@@ -50,8 +56,7 @@ class MovieLogger():
         #Create custom fonts
         self.bold = font.Font(weight="bold")
 
-        #create the watchlist that holds the list of movie objects
-        self.watchlist = []
+
 
         #load watchlist from file
         #to do
@@ -369,7 +374,24 @@ class MovieLogger():
         thumbnail = ImageTk.PhotoImage(image)
         movie.set_poster_image(thumbnail)
         return thumbnail
-            
+    
+    def save_movies_to_file(self, movies, filename):
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump([movie.to_dictionary() for movie in movies], f, indent=4)
+            print(f"added to file")
+    
+    def load_movies_from_file(self,filename):
+        movies = []
+        try:
+            with open(filename, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                for item in data:
+                    movie = Movie()
+                    movie = movie.load_from_dictionary(item)
+                    movies.append(movie)
+        except FileNotFoundError:
+            print(f"{filename} not found. Returning empty list.")
+        return movies
 
 
 generateUI()
