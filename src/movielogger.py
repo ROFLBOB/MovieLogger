@@ -298,8 +298,14 @@ class MovieLogger():
         #configure column weights
         lookup_window.columnconfigure(0,weight=1)
         lookup_window.columnconfigure(1, weight=2)
-
-
+        review_score = None
+        #check review score
+        for each in self.movie_reviews:
+            if lookup_window.movie.get_id() == each.get("imdbID"):
+                review_score = each.get("Review Score")
+        
+        if review_score == None:
+            review_score = "No Review Saved"
 
         #grid the labels to the lookup_window
         tk.Label(lookup_window, text="Movie Lookup:", justify="left", anchor="w").grid(column=0, row=0, sticky="nsew")
@@ -310,7 +316,7 @@ class MovieLogger():
         tk.Label(lookup_window, text=full_movie_info.get_title(), justify="left", anchor="w", font=self.bold).grid(column=1,row=0, sticky="nsew")
         tk.Label(lookup_window, text=metadata, justify="left", anchor="w").grid(column=1, row=1, sticky="nsew")
         WrappingLabel(lookup_window, text=f"Plot: {full_movie_info.get_plot()}", justify="left", anchor="w", wraplength=400).grid(column=0, row=2, columnspan=2, sticky="nsew")
-        tk.Label(lookup_window, text=f"{lookup_window.movie.get_review_score()}", justify="left", anchor="w").grid(column=0, row=3, sticky="nsew")
+        tk.Label(lookup_window, text=f"{review_score}", justify="left", anchor="w").grid(column=0, row=3, sticky="nsew")
         if lookup_window.movie in self.watchlist:
             tk.Button(lookup_window, text="In Watchlist", state=tk.DISABLED).grid(column=0,row=4, sticky="nsew")    
         else:
@@ -374,7 +380,7 @@ class MovieLogger():
         movie.set_review_score(scale.get())
         review_text = textbox.get("1.0", tk.END)
         movie.set_review_text(review_text)
-        self.movie_reviews.append(movie)
+        self.movie_reviews.append(movie.review_to_dictionary())
         print(f"{movie.get_title()} now has a review: {movie.get_review_text()}")
         self.save_movie_review(movie, "reviews.json")
         return movie
@@ -404,8 +410,7 @@ class MovieLogger():
     #should be an xml file, movie_reviews [{"ttid": "12345", "Review Score": 3.0, "Review": "Movie Review Here"}]
     def save_movie_review(self, movie, filename):
         with open(filename, "w", encoding="utf-8") as f:
-
-            json.dump([movie.review_to_dictionary() for movie in self.movie_reviews], f, indent=4)
+            json.dump(self.movie_reviews, f, indent=4)
             print(f"reviews saved.")
     
     def load_movies_from_file(self,filename):
@@ -421,6 +426,8 @@ class MovieLogger():
                     movies.append(movie)
         except FileNotFoundError:
             print(f"{filename} not found. Returning empty list.")
+        except Exception:
+            print("Error, returning empty list")
         return movies
     
     def load_reviews_from_file(self, filename):
@@ -431,10 +438,13 @@ class MovieLogger():
                 print(data)
                 for movie in data:
                     #print(movie)
-                    reviews.append({"imdbID":data["imdbID"],"Review Score":data["Review Score"],"Review":data["Review"]})
+                    reviews.append({"imdbID":movie["imdbID"],"Review Score":movie["Review Score"],"Review":movie["Review"]})
                 return reviews
         except FileNotFoundError:
             print(f"{filename} not found, returning empty list")
+            return reviews
+        except Exception:
+            print(f"Error. Returning empty list.")
             return reviews
 
 
