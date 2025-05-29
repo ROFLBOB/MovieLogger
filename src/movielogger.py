@@ -32,6 +32,9 @@ class MovieLogger():
 
         #load reviews doc
         self.movie_reviews = self.load_reviews_from_file("reviews.json")
+        
+        #favorites list
+        self.favorites = self.load_movies_from_file("favorites.json")
 
         #print(self.watchlist)
 
@@ -248,7 +251,7 @@ class MovieLogger():
     #takes a movie object
     def add_to_watchlist(self, movie):
         if movie in self.watchlist:
-            #print(f"{movie.get_title()} already in watchlist!")
+            print(f"{movie.get_title()} already in watchlist!")
             return
         self.watchlist.append(movie)
         #print(f"Added {movie.get_title()} to self.watchlist")
@@ -322,7 +325,7 @@ class MovieLogger():
         else:
             tk.Button(lookup_window, text="Add To Watchlist", command=lambda: self.add_to_watchlist(lookup_window.movie)).grid(column=0,row=4, sticky="nsew")
         
-        tk.Button(lookup_window, text="Favorite").grid(column=1,row=4, sticky="nsew")
+        tk.Button(lookup_window, text="Favorite", command=lambda : self.add_to_favorites(lookup_window.movie)).grid(column=1,row=4, sticky="nsew")
         tk.Button(lookup_window, text="Review", command=lambda : self.open_reviews(lookup_window.movie)).grid(column=2,row=4, sticky="nsew")
         
 
@@ -342,7 +345,8 @@ class MovieLogger():
 
     #adds the movie to the favorites list
     def add_to_favorites(self, movie):
-        return
+        self.favorites.append(movie)
+        print(self.favorites)
     
     #open the personal review for the specified movie
     def open_reviews(self, movie):
