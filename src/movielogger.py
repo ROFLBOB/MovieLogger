@@ -7,6 +7,7 @@ import tkinter as tk
 from format import WrappingLabel
 import requests, json
 from io import BytesIO
+from requests.exceptions import ConnectionError, MissingSchema
 
 def generateUI():
     root = tk.Tk()
@@ -25,6 +26,7 @@ class MovieLogger():
         bg_color = root.cget("background")
         rgb = root.winfo_rgb(bg_color)
         self.bg_color_code = "#%x%x%x" % rgb
+        self.total_results = "0"
 
 
         #load movies from watchlist if there are any saved
@@ -81,6 +83,8 @@ class MovieLogger():
         self.status_label.grid(row=1, column=0, sticky="nsew")
         self.watchlist_label = tk.Label(self.watchlist_frame, text="Watchlist")
         self.watchlist_label.grid(row=0, column = 0, sticky="nsew")
+        self.total_results_label = tk.Label(self.root, text=f"Search Results: {self.total_results}")
+        self.total_results_label.grid(row=3, column=0, sticky="nsew")
 
         #create buttons for interface & grid them
         self.search_button = tk.Button(self.root, text="Search Now", command=self.search)
@@ -160,6 +164,10 @@ class MovieLogger():
         connection = Connect("http://www.omdbapi.com/")
         self.movies_query = connection.search(search_query, page)
         #print(f"Movies Query:{self.movies_query}")
+
+        #for each movie in self.movies_query, use the movie info to create a new movies frame and pack it to the search frame
+        num_movies = 0
+
         if self.movies_query == "No movies found.":
             #no movies found so setting status label and returning early
             self.set_status_label(4)
@@ -167,12 +175,11 @@ class MovieLogger():
         #there's at least one movie returned
         self.set_status_label(2)
 
-        #for each movie in self.movies_query, use the movie info to create a new movies frame and pack it to the search frame
-        num_movies = 0
-
         #parent object of single movie frame must have weight so it expands
         self.movies_container.grid_columnconfigure(0,weight=1)
-
+        self.total_results_label.config(text=f"Total Results: {connection.total_results}")
+        print(connection.total_results)
+        
         for movie in self.movies_query:
             single_movie_frame = tk.Frame(self.movies_container)
             single_movie_frame.movie = movie
@@ -394,10 +401,14 @@ class MovieLogger():
     
     #takes a movie and returns a thumbnail image to be used in a label
     def download_movie_poster(self,movie):
-        if movie.get_thumbnail_url is None:
+        if movie.get_thumbnail_url() is None or movie.get_thumbnail_url() is 'N/A':
             return None
         url = movie.get_thumbnail_url()
-        download = requests.get(url,stream=True)
+        try:
+            download = requests.get(url,stream=True)
+        except (ConnectionError, MissingSchema) as e:
+            print(f"poster unavailable: {e}")
+            return
         if download.status_code != 200:
             return
         image_data = BytesIO(download.content)

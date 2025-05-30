@@ -15,6 +15,7 @@ class Connect():
             print("error loading API key from environment file. Does it exist?")
             self.__API_KEY = ""
         self.URL = URL
+        self.total_results = 0
 
     #connect to the api and search for a movie. Returns an array with either movie objects or an error message
     def search(self, title, page = 1):
@@ -28,6 +29,7 @@ class Connect():
             if data.get("Response") == "False":
                 return "No movies found."
             print(f"Data: {data}")
+            self.total_results = data.get("totalResults", 0)
             return self.format(data)
 
         else:
