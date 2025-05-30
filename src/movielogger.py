@@ -85,6 +85,8 @@ class MovieLogger():
         #create buttons for interface & grid them
         self.search_button = tk.Button(self.root, text="Search Now", command=self.search)
         self.search_button.grid(row=0, column=2, columnspan=2, sticky="nsew")
+        self.next_page_button = tk.Button(self.root, text="Next Page", command = lambda : self.search(page=2))
+        self.next_page_button.grid(row=3, column=1, sticky="nsew")
         
         #create text input for interface & grid them
         self.search_field = tk.Entry(self.root)
@@ -150,13 +152,13 @@ class MovieLogger():
 
         
     #search button function
-    def search(self):
+    def search(self, page=1):
         search_query = self.search_field.get()
         if len(search_query)<=0:
             self.set_status_label(3)
             return
         connection = Connect("http://www.omdbapi.com/")
-        self.movies_query = connection.search(search_query)
+        self.movies_query = connection.search(search_query, page)
         #print(f"Movies Query:{self.movies_query}")
         if self.movies_query == "No movies found.":
             #no movies found so setting status label and returning early

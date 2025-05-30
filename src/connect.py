@@ -17,8 +17,8 @@ class Connect():
         self.URL = URL
 
     #connect to the api and search for a movie. Returns an array with either movie objects or an error message
-    def search(self, title):
-        params = {"apikey":self.__API_KEY, "s":title}
+    def search(self, title, page = 1):
+        params = {"apikey":self.__API_KEY, "s":title, "page":page}
         response = requests.get(self.URL, params = params)
         #check if successful
         if response.status_code == 200:
