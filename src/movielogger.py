@@ -55,7 +55,12 @@ class MovieLogger():
         self.watchlist_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Watchlist", menu=self.watchlist_menu)
         self.watchlist_menu.add_command(label="Toggle Watchlist", command = self.toggle_frame)
-        self.watchlist_menu.add_command(label="Save Watchlist", command=lambda: self.save_movies_to_file(self.watchlist, "watchlist.json"))  
+        self.watchlist_menu.add_command(label="Save Watchlist", command=lambda: self.save_movies_to_file(self.watchlist, "watchlist.json"))
+
+        #Favorites
+        self.favorites_menu = tk.Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Favorites", menu=self.favorites_menu)
+        self.favorites_menu.add_command(label="View Favorites", command=lambda: self.open_favorites_window())
 
         #Review
         self.review_menu = tk.Menu(self.menubar, tearoff=0)
@@ -156,6 +161,8 @@ class MovieLogger():
         for entry in self.watchlist:
             self.add_movie_frame_to_watchlist(entry)
 
+        self.favorites_panel = None
+
         
     #search button function
     def search(self, page=1):
@@ -207,7 +214,7 @@ class MovieLogger():
             #make the buttons
             lookup_button = tk.Button(single_movie_frame, text="Lookup", command=lambda m=movie: self.lookup_movie(m))
             watchlist_button = tk.Button(single_movie_frame, text="Watchlist", command=lambda m=movie: self.add_to_watchlist(m))
-            favorites_button = tk.Button(single_movie_frame, text="Favorite")
+            favorites_button = tk.Button(single_movie_frame, text="Favorite", command=lambda m=movie: self.add_to_favorites(m))
             review_button = tk.Button(single_movie_frame, text="Review", command=lambda m=movie: self.open_reviews(m))
 
             #grid the labels to the frame
@@ -354,6 +361,27 @@ class MovieLogger():
         for element in self.watchlist_container.winfo_children():
             if element.movie == movie:
                 element.destroy()
+    
+    #remove specific movie from favorites
+    def remove_movie_from_favorites(self, movie):
+        for m in self.favorites:
+            if m == movie:
+                self.favorites.remove(m)
+                #print(f"{m.get_title()} removed from the watchlist.")
+        #if the favorites window is up, refresh it
+        if self.favorites_panel.winfo_exists():
+            self.favorites_panel.update()
+            self.favorites_panel.update_idletasks()
+
+    #be a good programmer and swap out remove_from_watchlist and remove_from_favorites with function below
+    def remove_movie_from_list(self, movie, list_of_movies):
+        #remove movie from the list
+        for m in list_of_movies:
+            if m == movie:
+                list_of_movies.remove(m)
+                print(f"Removed {m} from list.")
+        #remove movie frame from the window
+
 
 
 
@@ -361,6 +389,20 @@ class MovieLogger():
     def add_to_favorites(self, movie):
         self.favorites.append(movie)
         print(self.favorites)
+
+    def open_favorites_window(self):
+        self.favorites_panel = tk.Toplevel(self.root)
+        self.favorites_panel.geometry("600x600")
+        self.favorites_panel.title("Favorite Movies")
+        for each in self.favorites:
+            #each is a movie object. create a frame with a label, lookup, and favorite button for each item in favorites
+            favorite_movie_frame = tk.Frame(self.favorites_panel)
+            favorite_movie_frame.movie = each.get_title()
+            tk.Label(favorite_movie_frame, text=f"{each.get_title()}", font=self.bold).grid(row=0, column=0, sticky="nsew")
+            tk.Button(favorite_movie_frame, text=f"Lookup", command=lambda m=each:self.lookup_movie(m)).grid(row=0, column=1, sticky="nsew")
+            tk.Button(favorite_movie_frame, text=f"Remove from Favorites", command=lambda m=each: self.remove_movie_from_favorites(m)).grid(row=0, column=2, sticky="nsew")
+            favorite_movie_frame.pack()
+        return
     
     #open the personal review for the specified movie
     def open_reviews(self, movie):
@@ -390,8 +432,9 @@ class MovieLogger():
         review_scale.pack()
         written_review.pack()
         set_review_button.pack()
-
-
+        return
+    
+    def open_all_reviews_window(self):
         return
     
     def set_review(self, movie, scale, textbox):
