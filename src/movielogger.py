@@ -27,6 +27,8 @@ class MovieLogger():
         rgb = root.winfo_rgb(bg_color)
         self.bg_color_code = "#%x%x%x" % rgb
         self.total_results = "0"
+        self.current_page = 1
+        self.total_pages = 1
 
 
         #load movies from watchlist if there are any saved
@@ -63,11 +65,6 @@ class MovieLogger():
 
         #Create custom fonts
         self.bold = font.Font(weight="bold")
-
-
-
-        #load watchlist from file
-        #to do
     
         #create the frames
         self.watchlist_frame = tk.Frame(self.root)
@@ -83,14 +80,19 @@ class MovieLogger():
         self.status_label.grid(row=1, column=0, sticky="nsew")
         self.watchlist_label = tk.Label(self.watchlist_frame, text="Watchlist")
         self.watchlist_label.grid(row=0, column = 0, sticky="nsew")
-        self.total_results_label = tk.Label(self.root, text=f"Search Results: {self.total_results}")
+        self.total_results_label = tk.Label(self.root, text=f"Search Results: {self.total_results}\nCurrent Page: {self.current_page}")
         self.total_results_label.grid(row=3, column=0, sticky="nsew")
 
         #create buttons for interface & grid them
         self.search_button = tk.Button(self.root, text="Search Now", command=self.search)
         self.search_button.grid(row=0, column=2, columnspan=2, sticky="nsew")
-        self.next_page_button = tk.Button(self.root, text="Next Page", command = lambda : self.search(page=2))
-        self.next_page_button.grid(row=3, column=1, sticky="nsew")
+        if self.current_page > 1:
+            self.prev_page_button = tk.Button(self.root, text="Previous Page", state=DISABLED)
+        else:
+            self.prev_page_button = tk.Button(self.root, text="Previous Page", command = lambda : self.search(page=self.current_page-1))
+        self.prev_page_button.grid(row=3, column=1, sticky="nsew")
+        self.next_page_button = tk.Button(self.root, text="Next Page", command = lambda : self.search(page=self.current_page+1))
+        self.next_page_button.grid(row=3, column=2, sticky="nsew")
         
         #create text input for interface & grid them
         self.search_field = tk.Entry(self.root)
@@ -177,7 +179,10 @@ class MovieLogger():
 
         #parent object of single movie frame must have weight so it expands
         self.movies_container.grid_columnconfigure(0,weight=1)
-        self.total_results_label.config(text=f"Total Results: {connection.total_results}")
+        self.total_results_label.config(text=f"Search Results: {connection.total_results}\nPage: {self.current_page}")
+        self.total_results = connection.total_results
+        self.total_pages = int(self.total_results)/10
+        self.current_page = page
         print(connection.total_results)
         
         for movie in self.movies_query:
@@ -191,7 +196,7 @@ class MovieLogger():
 
 
             #make the labels
-            title_label = tk.Label(single_movie_frame, text=movie.get_title())
+            title_label = WrappingLabel(single_movie_frame, text=movie.get_title())
             year_label = tk.Label(single_movie_frame, text=movie.get_year())
             id_label = tk.Label(single_movie_frame, text=movie.get_id())
             if poster == None:
@@ -212,10 +217,10 @@ class MovieLogger():
             id_label.grid(row=2, column=1, sticky="nsew")
 
             #grid the buttons
-            lookup_button.grid(row=0, column=2, sticky="nsew")
-            watchlist_button.grid(row=0, column=3, sticky="nsew")
-            favorites_button.grid(row=0, column=4, sticky="nsew") 
-            review_button.grid(row=0, column=5, sticky="nsew")
+            lookup_button.grid(row=0, column=2, rowspan=3, sticky="nsew")
+            watchlist_button.grid(row=0, column=3, rowspan=3, sticky="nsew")
+            favorites_button.grid(row=0, column=4, rowspan=3, sticky="nsew") 
+            review_button.grid(row=0, column=5, rowspan=3, sticky="nsew")
 
             #grid the frame to self.movies_container
             single_movie_frame.grid(row = num_movies, column = 0, sticky="nsew")
@@ -401,7 +406,7 @@ class MovieLogger():
     
     #takes a movie and returns a thumbnail image to be used in a label
     def download_movie_poster(self,movie):
-        if movie.get_thumbnail_url() is None or movie.get_thumbnail_url() is 'N/A':
+        if movie.get_thumbnail_url() == None or movie.get_thumbnail_url() == 'N/A':
             return None
         url = movie.get_thumbnail_url()
         try:
