@@ -362,16 +362,7 @@ class MovieLogger():
             if element.movie == movie:
                 element.destroy()
     
-    #remove specific movie from favorites
-    def remove_movie_from_favorites(self, movie):
-        for m in self.favorites:
-            if m == movie:
-                self.favorites.remove(m)
-                #print(f"{m.get_title()} removed from the watchlist.")
-        #if the favorites window is up, refresh it
-        if self.favorites_panel.winfo_exists():
-            self.favorites_panel.update()
-            self.favorites_panel.update_idletasks()
+   
 
     #be a good programmer and swap out remove_from_watchlist and remove_from_favorites with function below
     def remove_movie_from_list(self, movie, list_of_movies):
@@ -383,26 +374,39 @@ class MovieLogger():
         #remove movie frame from the window
 
 
+    #remove specific movie from favorites
+    def remove_movie_from_favorites(self, movie, frame):
+        if movie in self.favorites:
+            self.favorites.remove(movie)
+            self.refresh_favorites_window()
 
+    def refresh_favorites_window(self):
+        #clear the current favorites window
+        for widget in self.favorites_panel.winfo_children():
+            widget.destroy()
+
+        #rebuild the panel
+        for each in self.favorites:
+            favorite_movie_frame = tk.Frame(self.favorites_panel)
+            favorite_movie_frame.movie = each.get_title()
+            tk.Label(favorite_movie_frame, text=f"{each.get_title()}", font=self.bold).grid(row=0, column=0, sticky="nsew")
+            tk.Button(favorite_movie_frame, text=f"Lookup", command=lambda m=each:self.lookup_movie(m)).grid(row=0, column=1, sticky="nsew")
+            tk.Button(favorite_movie_frame, text=f"Remove from Favorites", command=lambda m=each: self.remove_movie_from_favorites(m,favorite_movie_frame)).grid(row=0, column=2, sticky="nsew")
+            favorite_movie_frame.pack()
+            
 
     #adds the movie to the favorites list
     def add_to_favorites(self, movie):
+        if movie in self.favorites:
+            return
         self.favorites.append(movie)
-        print(self.favorites)
+        print(f"Full favorites List: {self.favorites}")
 
     def open_favorites_window(self):
         self.favorites_panel = tk.Toplevel(self.root)
         self.favorites_panel.geometry("600x600")
         self.favorites_panel.title("Favorite Movies")
-        for each in self.favorites:
-            #each is a movie object. create a frame with a label, lookup, and favorite button for each item in favorites
-            favorite_movie_frame = tk.Frame(self.favorites_panel)
-            favorite_movie_frame.movie = each.get_title()
-            tk.Label(favorite_movie_frame, text=f"{each.get_title()}", font=self.bold).grid(row=0, column=0, sticky="nsew")
-            tk.Button(favorite_movie_frame, text=f"Lookup", command=lambda m=each:self.lookup_movie(m)).grid(row=0, column=1, sticky="nsew")
-            tk.Button(favorite_movie_frame, text=f"Remove from Favorites", command=lambda m=each: self.remove_movie_from_favorites(m)).grid(row=0, column=2, sticky="nsew")
-            favorite_movie_frame.pack()
-        return
+        self.refresh_favorites_window()
     
     #open the personal review for the specified movie
     def open_reviews(self, movie):
