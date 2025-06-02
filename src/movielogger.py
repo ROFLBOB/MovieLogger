@@ -400,6 +400,8 @@ class MovieLogger():
         if movie in self.favorites:
             return
         self.favorites.append(movie)
+        #save to favorites.json
+        self.save_movies_to_file(self.favorites, "favorites.json")
         print(f"Full favorites List: {self.favorites}")
 
     def open_favorites_window(self):

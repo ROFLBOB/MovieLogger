@@ -18,3 +18,4 @@ movie_data/
 #ignore json file
 watchlist.json
 reviews.json
+favorites.json
