@@ -49,6 +49,7 @@ class MovieLogger():
         #File
         self.file_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="File", menu=self.file_menu)
+        self.file_menu.add_command(label="Set API Key", command=self.edit_api)
         self.file_menu.add_command(label="Exit", command=self.exit_program)
         
         #Watchlist
@@ -538,6 +539,55 @@ class MovieLogger():
         except Exception:
             print(f"Error. Returning empty list.")
             return reviews
+
+    def edit_api(self):
+        api_panel = tk.Toplevel(self.root)
+        api_panel.geometry("300x300")
+        api_panel.title(f"API Key")
+        tk.Label(api_panel, text="Enter OMDB API Key:").pack()
+        self.api_field = tk.Entry(api_panel)
+        self.api_field.pack()
+        save_api_button = tk.Button(api_panel,text="Save", command=self.save_api_key)
+        save_api_button.pack()
+        self.api_status=tk.Label(api_panel, text="")
+        self.api_status.pack()
+
+
+        #load existing key if possible
+        try:
+            with open('.env', 'r') as f:
+                for line in f:
+                    if "API_KEY" in line:
+                        key = line.split('=')[1].strip()
+                        self.api_field.insert(0, key)
+        except FileNotFoundError:
+            pass
+
+    def save_api_key(self):
+        key = self.api_field.get().strip()
+        if not key:
+            self.api_status.config(text="Key cannot be empty!", fg="red")
+            return
+        try:
+            #create or update .env file
+            with open('.env', 'w') as f:
+                f.write(f"API_KEY={key}")
+            
+            self.api_status.config(text="Key saved successfully.", fg="green")
+
+            #update current session
+            self.update_current_session_key(key)
+
+        except Exception as e:
+            self.api_status.config(text=f"Error: {str(e)}", fg="red")
+    
+    def update_current_session_key(self, key):
+        connection = Connect("http://www.omdbapi.com/")
+        connection.set_api_key(key)
+
+        self.status_label.config(text="API Key Updated")
+
+
 
 
     #"imdbID": self.get_id(),

@@ -6,20 +6,21 @@ import os
 #This class connects to the OMDB API and collects information about the movies or errors
 class Connect():
     def __init__(self, URL):
-        load_dotenv()
-        try:
-            self.__API_KEY = os.getenv("API_KEY", default = "demo_key")
-            if self.__API_KEY == "demo_key":
-                return
-        except Exception:
-            print("error loading API key from environment file. Does it exist?")
-            self.__API_KEY = ""
         self.URL = URL
         self.total_results = 0
+        self.load_api_key()
+
+
+    def load_api_key(self):
+        load_dotenv(override=True)
+        self.api_key=os.getenv("API_KEY", default="demo_key")
+
+    def set_api_key(self, new_key):
+        self.api_key = new_key
 
     #connect to the api and search for a movie. Returns an array with either movie objects or an error message
     def search(self, title, page = 1):
-        params = {"apikey":self.__API_KEY, "s":title, "page":page}
+        params = {"apikey":self.api_key, "s":title, "page":page}
         response = requests.get(self.URL, params = params)
         #check if successful
         if response.status_code == 200:
@@ -29,7 +30,7 @@ class Connect():
             if data.get("Response") == "False":
                 return "No movies found."
             print(f"Data: {data}")
-            self.total_results = data.get("totalResults", 0)
+            self.total_results = str(data.get("totalResults", "0"))
             return self.format(data)
 
         else:
@@ -62,7 +63,7 @@ class Connect():
 
         
     def lookup(self, id):
-        params = {"apikey":self.__API_KEY, "i":id}
+        params = {"apikey":self.api_key, "i":id}
         response = requests.get(self.URL, params = params)
         #check if successful
         if response.status_code == 200:
