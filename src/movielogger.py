@@ -91,12 +91,9 @@ class MovieLogger():
         #create buttons for interface & grid them
         self.search_button = tk.Button(self.root, text="Search Now", command=self.search)
         self.search_button.grid(row=0, column=2, columnspan=2, sticky="nsew")
-        if self.current_page > 1:
-            self.prev_page_button = tk.Button(self.root, text="Previous Page", state=DISABLED)
-        else:
-            self.prev_page_button = tk.Button(self.root, text="Previous Page", command = lambda : self.search(page=self.current_page-1))
+        self.prev_page_button = tk.Button(self.root, text="Previous Page", state=DISABLED)
         self.prev_page_button.grid(row=3, column=1, sticky="nsew")
-        self.next_page_button = tk.Button(self.root, text="Next Page", command = lambda : self.search(page=self.current_page+1))
+        self.next_page_button = tk.Button(self.root, text="Next Page", state=DISABLED)
         self.next_page_button.grid(row=3, column=2, sticky="nsew")
         
         #create text input for interface & grid them
@@ -186,11 +183,6 @@ class MovieLogger():
 
         #parent object of single movie frame must have weight so it expands
         self.movies_container.grid_columnconfigure(0,weight=1)
-        self.total_results_label.config(text=f"Search Results: {connection.total_results}\nPage: {self.current_page}")
-        self.total_results = connection.total_results
-        self.total_pages = int(self.total_results)/10
-        self.current_page = page
-        print(connection.total_results)
         
         for movie in self.movies_query:
             single_movie_frame = tk.Frame(self.movies_container)
@@ -242,11 +234,40 @@ class MovieLogger():
             num_movies += 1
 
 
+        #update pagination buttons
+        self.update_pagination_controls(connection.total_results, page)
 
         self.search_results_canvas.update_idletasks()
         self.search_results_canvas.config(scrollregion=self.search_results_canvas.bbox("all"))
         #print(self.movies_query)
 
+    def update_pagination_controls(self, total_results, current_page):
+        self.current_page = current_page
+        #calculate total pages
+        total_pages = (int(total_results)+9)//10 
+
+        #update results label
+        self.total_results_label.config(
+            text=f"Search Results: {total_results}\nPage: {current_page}/{total_pages}"
+        )
+
+        #update previous button
+        if current_page <= 1:
+            self.prev_page_button.config(state=DISABLED)
+        else:
+            self.prev_page_button.config(
+                state=tk.NORMAL,
+                command=lambda:self.search(page=current_page-1)
+            )
+        
+        #update next button
+        if current_page >= total_pages:
+            self.next_page_button.config(state=tk.DISABLED)
+        else:
+            self.next_page_button.config(
+                state=tk.NORMAL,
+                command=lambda: self.search(page=current_page+1)
+            )
         
     #updated the status label on the main window
     def set_status_label(self,status):
