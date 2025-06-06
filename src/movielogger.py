@@ -66,8 +66,7 @@ class MovieLogger():
         #Review
         self.review_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Review", menu=self.review_menu)
-        self.review_menu.add_command(label="Add/Update Review")
-        self.review_menu.add_command(label="Read Review")
+        self.review_menu.add_command(label="Read All Reviews", command=lambda: self.open_all_reviews_window())
 
         #Create custom fonts
         self.bold = font.Font(weight="bold")
@@ -322,25 +321,36 @@ class MovieLogger():
 
     #opens a new top level window that has more information about the movie such as a bigger thumbnail, actors, plot, etc
     #takes a movie object
-    def lookup_movie(self, movie=None):
-        if movie is None:
-            print("error, lookup button clicked and movie is None")
+    def lookup_movie(self, movie=None, id=None):
+        if movie == None and id == None:
+            print("error, lookup button clicked and movie/ttid is None")
             return
-        print(f"Looking up movie: {movie.get_title()}, {movie.get_id}")
+        #print(f"Looking up movie: {movie.get_title()}, {movie.get_id}")
         #find the name of the movie frame that was clicked
         lookup_window = tk.Toplevel(self.root)
         lookup_window.geometry("400x400")
-        lookup_window.movie = movie
+
+        if movie is not None:
+            lookup_window.movie = movie
+        
 
         #from here, connect to the API and search for the ttid. Then, gather the extra information and display it in a window
         movie_lookup = Connect(self._OMDB_URL)
-        full_movie_info = movie_lookup.lookup(movie.get_id())
+        if id != None:
+            #id is not empty, searching via id
+            #this is a movie object
+            full_movie_info = movie_lookup.lookup(id)
+            lookup_window.movie = full_movie_info
+            movie = full_movie_info
+        else:
+            full_movie_info = movie_lookup.lookup(movie.get_id())
         if full_movie_info == None:
             #there's an error, return None
             print("error in lookup, connection error")
             tk.Label(lookup_window, text="Connection error.", font=self.bold, fg="red").grid(row=0, column=0, sticky="nsew")
             return None
-        lookup_window.title(movie.get_title())
+        else:
+            lookup_window.title=(full_movie_info.get_title())
 
         #get string for metadata
         metadata = f"Released: {full_movie_info.get_released()}\nRating: {full_movie_info.get_rating()}\n"\
@@ -438,6 +448,7 @@ class MovieLogger():
         self.favorites_panel.geometry("600x600")
         self.favorites_panel.title("Favorite Movies")
         self.refresh_favorites_window()
+
     
     #open the personal review for the specified movie
     def open_reviews(self, movie):
@@ -470,7 +481,24 @@ class MovieLogger():
         return
     
     def open_all_reviews_window(self):
-        return
+        self.all_reviews_panel = tk.Toplevel(self.root)
+        self.all_reviews_panel.geometry("600x600")
+        self.all_reviews_panel.title("Favorite Movies")
+        self.refresh_reviews_window()
+    
+    def refresh_reviews_window(self):
+        #clear the current favorites window
+        for widget in self.all_reviews_panel.winfo_children():
+            widget.destroy()
+
+        #rebuild the panel
+        for each in self.movie_reviews:
+            #self.movie_reviews is a list of dictionary items with id and review score
+            reviews_movie_frame = tk.Frame(self.all_reviews_panel)
+            reviews_movie_frame.movie_id = each.get("imdbID")
+            tk.Label(reviews_movie_frame, text=f"{each.get("Title", "N/A")}", font=self.bold).grid(row=0, column=0, sticky="nsew")
+            tk.Button(reviews_movie_frame, text=f"Lookup", command=lambda m=each.get("imdbID"):self.lookup_movie(id=m)).grid(row=0, column=1, sticky="nsew")
+            reviews_movie_frame.pack()
     
     def set_review(self, movie, scale, textbox):
         movie.set_review_score(scale.get())
