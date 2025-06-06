@@ -335,6 +335,11 @@ class MovieLogger():
         #from here, connect to the API and search for the ttid. Then, gather the extra information and display it in a window
         movie_lookup = Connect(self._OMDB_URL)
         full_movie_info = movie_lookup.lookup(movie.get_id())
+        if full_movie_info == None:
+            #there's an error, return None
+            print("error in lookup, connection error")
+            tk.Label(lookup_window, text="Connection error.", font=self.bold, fg="red").grid(row=0, column=0, sticky="nsew")
+            return None
         lookup_window.title(movie.get_title())
 
         #get string for metadata
@@ -367,8 +372,10 @@ class MovieLogger():
             tk.Button(lookup_window, text="In Watchlist", state=tk.DISABLED).grid(column=0,row=4, sticky="nsew")    
         else:
             tk.Button(lookup_window, text="Add To Watchlist", command=lambda: self.add_to_watchlist(lookup_window.movie)).grid(column=0,row=4, sticky="nsew")
-        
-        tk.Button(lookup_window, text="Favorite", command=lambda : self.add_to_favorites(lookup_window.movie)).grid(column=1,row=4, sticky="nsew")
+        if lookup_window.movie in self.favorites:
+            tk.Button(lookup_window, text="In Favorites", state=tk.DISABLED).grid(column=1,row=4, sticky="nsew")
+        else:
+            tk.Button(lookup_window, text="Favorite", command=lambda : self.add_to_favorites(lookup_window.movie)).grid(column=1,row=4, sticky="nsew")
         tk.Button(lookup_window, text="Review", command=lambda : self.open_reviews(lookup_window.movie)).grid(column=2,row=4, sticky="nsew")
         
 
