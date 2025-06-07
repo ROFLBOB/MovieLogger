@@ -491,11 +491,14 @@ class MovieLogger():
         for widget in self.all_reviews_panel.winfo_children():
             widget.destroy()
 
+        print(self.movie_reviews)
         #rebuild the panel
         for each in self.movie_reviews:
             #self.movie_reviews is a list of dictionary items with id and review score
             reviews_movie_frame = tk.Frame(self.all_reviews_panel)
             reviews_movie_frame.movie_id = each.get("imdbID")
+            print("This movie is: \n")
+            print(each)
             tk.Label(reviews_movie_frame, text=f"{each.get("Title", "N/A")}", font=self.bold).grid(row=0, column=0, sticky="nsew")
             tk.Button(reviews_movie_frame, text=f"Lookup", command=lambda m=each.get("imdbID"):self.lookup_movie(id=m)).grid(row=0, column=1, sticky="nsew")
             reviews_movie_frame.pack()
@@ -566,7 +569,7 @@ class MovieLogger():
                 print(data)
                 for movie in data:
                     #print(movie)
-                    reviews.append({"imdbID":movie["imdbID"],"Review Score":movie["Review Score"],"Review":movie["Review"]})
+                    reviews.append({"Title": movie["Title"], "imdbID":movie["imdbID"],"Review Score":movie["Review Score"],"Review":movie["Review"]})
                 return reviews
         except FileNotFoundError:
             print(f"{filename} not found, returning empty list")

@@ -95,7 +95,7 @@ class Movie():
     #convert movie review to dictionary
     def review_to_dictionary(self):
         return{
-            "Title":self.get_title(),
+            "Title": self.get_title(),
             "imdbID": self.get_id(),
             "Review Score": self.get_review_score(),
             "Review": self.get_review_text()
