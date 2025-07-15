@@ -101,9 +101,9 @@ class MovieLogger():
         self.search_field.grid(row=0, column=1, sticky="nsew")
         
         #create the canvases & grid it
-        self.search_results_canvas = tk.Canvas(self.root, bg=bg_color, highlightbackground="blue")
+        self.search_results_canvas = tk.Canvas(self.root, bg=bg_color)
         self.search_results_canvas.grid(row=2, column=0, columnspan=3, sticky="nsew")
-        self.watchlist_canvas = tk.Canvas(self.watchlist_frame, bg=bg_color, highlightbackground="blue")
+        self.watchlist_canvas = tk.Canvas(self.watchlist_frame, bg=bg_color)
         self.watchlist_canvas.grid(row=1, column=0, columnspan=3, sticky="nsew")
 
         #create scrollbar within the search_results canvas
@@ -195,25 +195,27 @@ class MovieLogger():
 
 
             #make the labels
+            combo_label = WrappingLabel(single_movie_frame, text=f"{movie.get_title()}\n{movie.get_year()}\n{movie.get_id()}")
             title_label = WrappingLabel(single_movie_frame, text=movie.get_title())
-            year_label = tk.Label(single_movie_frame, text=movie.get_year())
-            id_label = tk.Label(single_movie_frame, text=movie.get_id())
+            year_label = ttk.Label(single_movie_frame, text=movie.get_year())
+            id_label = ttk.Label(single_movie_frame, text=movie.get_id())
             if poster == None:
-                thumbnail_label = tk.Label(single_movie_frame, text="Not Available")
+                thumbnail_label = ttk.Label(single_movie_frame, text="Not Available")
             else:
-                thumbnail_label = tk.Label(single_movie_frame, text="URL", image=poster)
+                thumbnail_label = ttk.Label(single_movie_frame, text="URL", image=poster)
 
             #make the buttons
-            lookup_button = tk.Button(single_movie_frame, text="Lookup", command=lambda m=movie: self.lookup_movie(m))
-            watchlist_button = tk.Button(single_movie_frame, text="Watchlist", command=lambda m=movie: self.add_to_watchlist(m))
-            favorites_button = tk.Button(single_movie_frame, text="Favorite", command=lambda m=movie: self.add_to_favorites(m))
-            review_button = tk.Button(single_movie_frame, text="Review", command=lambda m=movie: self.open_reviews(m))
+            lookup_button = ttk.Button(single_movie_frame, text="Lookup", command=lambda m=movie: self.lookup_movie(m))
+            watchlist_button = ttk.Button(single_movie_frame, text="Watchlist", command=lambda m=movie: self.add_to_watchlist(m))
+            favorites_button = ttk.Button(single_movie_frame, text="Favorite", command=lambda m=movie: self.add_to_favorites(m))
+            review_button = ttk.Button(single_movie_frame, text="Review", command=lambda m=movie: self.open_reviews(m))
 
             #grid the labels to the frame
-            thumbnail_label.grid(row=0, column=0, rowspan=3, sticky="nsew")
-            title_label.grid(row=0, column=1, sticky="nsew")
-            year_label.grid(row=1, column=1, sticky="nsew")
-            id_label.grid(row=2, column=1, sticky="nsew")
+            thumbnail_label.grid(row=0, column=0, rowspan=3, sticky="ew")
+            #title_label.grid(row=0, column=1, sticky="ew")
+            #year_label.grid(row=1, column=1, sticky="ew")
+            #id_label.grid(row=2, column=1, sticky="ew")
+            combo_label.grid(row=0, column=1, rowspan=3)
 
             #grid the buttons
             lookup_button.grid(row=0, column=2, rowspan=3, sticky="nsew")
@@ -223,7 +225,7 @@ class MovieLogger():
 
             #grid the frame to self.movies_container
             single_movie_frame.grid(row = num_movies, column = 0, sticky="nsew")
-            single_movie_frame.config(highlightbackground = "green", borderwidth=1, highlightthickness=1)
+            single_movie_frame.config(borderwidth=1, highlightthickness=1)
 
             #set the weights
             single_movie_frame.grid_columnconfigure(0, weight=1)
@@ -468,7 +470,7 @@ class MovieLogger():
         review_scale = Scale(reviews_panel, variable=DoubleVar, from_=0.5, to=5.0, tickinterval=0.5, orient="horizontal", length=500, resolution=0.5)
         review_scale.set(review_score)
         
-        #set_review_button = tk.Button(reviews_panel, text="Save Review", command=lambda m=movie:m.set_review_score(review_scale.get()))
+        #set_review_button = tk.Button(reviews_panel, text="1Save Review", command=lambda m=movie:m.set_review_score(review_scale.get()))
         set_review_button = tk.Button(reviews_panel, text="Save Review", command=lambda m=movie:self.set_review(m, review_scale, written_review))
 
         written_review = scrolledtext.ScrolledText(reviews_panel, wrap=tk.WORD, width=80, height=20)
@@ -483,7 +485,7 @@ class MovieLogger():
     def open_all_reviews_window(self):
         self.all_reviews_panel = tk.Toplevel(self.root)
         self.all_reviews_panel.geometry("600x600")
-        self.all_reviews_panel.title("Favorite Movies")
+        self.all_reviews_panel.title("Reviewed Movies")
         self.refresh_reviews_window()
     
     def refresh_reviews_window(self):
