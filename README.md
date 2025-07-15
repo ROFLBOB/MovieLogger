@@ -1,6 +1,8 @@
 # Movie Logger
 
-A python application built in Tkinter that allows users to search for movies, view general information about the movies, add them to a list of their favorites, and write reviews for movies.
+A python application built in Tkinter that allows users to search for movies, view general information about the movies, add them to a list of their favorites, and write reviews for movies. 
+
+This application serves as my first forray into API calls via python and GUI development. It was developed as part of the Boot.dev Personal Project course. Learn more about [Boot.dev](https://boot.dev).
 
 ## Features
 
