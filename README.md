@@ -27,7 +27,8 @@ source venv/bin/activate #on windows use: venv\Scripts\activate
 git clone https://github.com/ROFLBOB/MovieLogger
 ```
 3. Install dependecies with
-```pip install -r requirements.txt
+```
+pip install -r requirements.txt
 ```
 4. Obtain an OMDB API key from omdbapi.com 
 5. Run the app. Navigate to the directory and type:
