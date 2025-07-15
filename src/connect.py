@@ -18,6 +18,7 @@ class Connect():
     def set_api_key(self, new_key):
         self.api_key = new_key
 
+
     #connect to the api and search for a movie. Returns an array with either movie objects or an error message
     def search(self, title, page = 1):
         params = {"apikey":self.api_key, "s":title, "page":page}

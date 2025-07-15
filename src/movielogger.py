@@ -188,7 +188,7 @@ class MovieLogger():
             single_movie_frame = tk.Frame(self.movies_container)
             single_movie_frame.movie = movie
             if not (isinstance(movie, Movie)):
-                raise TypeError("movie must be a Movie object")
+                raise TypeError("movie must be a Movie object. Incorrect API key?")
 
             #download the poster
             poster = self.download_movie_poster(movie)
